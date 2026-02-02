@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>면목동 맛집</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!-- ✅ 1단계 오픈용 SEO/공유 기본 세팅 -->
+<meta name="description" content="면목동 주민이 직접 고른 동네 맛집 모음. 광고는 ‘광고’로 표시합니다." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="ko_KR" />
+<meta property="og:title" content="면목동 맛집" />
+<meta property="og:description" content="면목동 주민이 직접 고른 동네 맛집 모음. 광고는 ‘광고’로 표시합니다." />
+<meta property="og:url" content="https://dongnepage.netlify.app/" />
+<link rel="canonical" href="https://dongnepage.netlify.app/" />
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;}
+:root{
+  --bg1:#f8fafc; --bg2:#fffaf5; --text:#0f172a; --muted:#64748b;
+  --border:#e5e7eb; --shadow:0 18px 55px rgba(15,23,42,.12);
+  --card:#ffffff;
+}
+body.dark{
+  --bg1:#0b1220; --bg2:#0b1220; --text:#f8fafc; --muted:#94a3b8;
+  --border:#223047; --shadow:0 18px 55px rgba(0,0,0,.35);
+  --card:#0f1a2e;
+}
+body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));color:var(--text);}
+
+.topbar{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);z-index:10;}
+.topbar-inner{max-width:1200px;margin:0 auto;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+
+/* ✅ 브랜드(심플) */
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap;}
+.logo{width:22px;height:22px;display:grid;place-items:center;}
+.logo svg{width:22px;height:22px;display:block}
+.brand-text{font-weight:950;letter-spacing:-.2px;font-size:16px;}
+
+.top-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+
+/* 버튼 공통 */
+.nick-btn,.dark-btn,.contact-btn,.share-btn{
+  padding:10px 12px;border-radius:12px;
+  font-weight:900;cursor:pointer;
+  background:transparent;
+  white-space:nowrap;
+}
+.nick-btn{border:1px solid #2563eb;color:#2563eb;font-weight:800;}
+.dark-btn{border:1px solid var(--border);color:var(--text);}
+.dark-btn:hover{border-color:#cbd5e1}
+.contact-btn{border:1px solid #2563eb;color:#2563eb;}
+.contact-btn:hover{opacity:.92}
+.share-btn{border:1px solid var(--border);color:var(--text);}
+.share-btn:hover{border-color:#cbd5e1}
+
+/* 라벨(모바일에서 짧게) */
+.btn-label-long{display:inline;}
+.btn-label-short{display:none;}
+
+.container{max-width:1200px;margin:0 auto;padding:26px 22px 22px;display:grid;grid-template-columns:1fr 290px;gap:22px;}
+.page-hero{padding:22px;border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);}
+.page-title{
+  font-size:28px;font-weight:950;
+  background:linear-gradient(90deg,#2563eb,#22c55e);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.subtitle{margin-top:6px;color:var(--muted);font-weight:700;font-size:14px;line-height:1.45;}
+.subtitle b{color:var(--text)}
+.controls{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.search{flex:1;min-width:220px;}
+.search input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);font-weight:700;background:var(--card);color:var(--text);}
+.pill-row{display:flex;gap:8px;flex-wrap:wrap;}
+.pill{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-weight:800;cursor:pointer;color:var(--text);}
+.pill.active{background:#2563eb;color:#fff;border-color:#2563eb;}
+.sort select{
+  padding:12px 14px;border-radius:14px;border:1px solid var(--border);
+  font-weight:800;background:var(--card);color:var(--text);cursor:pointer;
+}
+
+/* 배너 */
+.banner{
+  margin-top:14px;
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:linear-gradient(90deg, rgba(37,99,235,.10), rgba(34,197,94,.10));
+  box-shadow:0 12px 30px rgba(15,23,42,.08);
+  overflow:hidden;
+}
+body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34,197,94,.20));}
+.banner-inner{padding:14px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.banner-left{display:flex;align-items:center;gap:12px;min-width:0;}
+.banner-badge{
+  width:44px;height:44px;border-radius:16px;
+  background:linear-gradient(135deg, rgba(37,99,235,.25), rgba(34,197,94,.25));
+  border:1px solid var(--border);
+  display:grid;place-items:center;flex:0 0 auto;
+}
+.banner-badge svg{width:26px;height:26px;display:block}
+.banner-text{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.banner-tag{font-size:12px;font-weight:950;color:#2563eb;display:flex;align-items:center;gap:8px;}
+.ad-chip{
+  font-size:11px;font-weight:950;padding:6px 10px;border-radius:999px;
+  background:rgba(0,0,0,.65);color:#fff;display:inline-block;
+}
+.banner-title{font-size:14px;font-weight:950;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.banner-sub{font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.banner-actions{display:flex;gap:8px;flex:0 0 auto;align-items:center;}
+.banner-mini{
+  padding:10px 12px;border-radius:14px;border:1px solid var(--border);background:var(--card);
+  font-weight:950;cursor:pointer;white-space:nowrap;color:var(--text);
+}
+.banner-mini:hover{border-color:#cbd5e1}
+
+.grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.card{border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:0 14px 35px rgba(15,23,42,.1);overflow:hidden;cursor:pointer;position:relative;}
+.thumb{height:180px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(15,23,42,.04),rgba(15,23,42,.02));}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;z-index:1;}
+.thumb .img-overlay{
+  position:absolute;inset:0;z-index:2;
+  background:linear-gradient(180deg, rgba(15,23,42,.00), rgba(15,23,42,.06));
+}
+.thumb-illus{position:absolute;inset:0;display:block;z-index:1;}
+.thumb-illus svg{width:100%;height:100%;display:block;}
+.badge{position:absolute;top:12px;left:12px;background:rgba(0,0,0,.65);color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:900;z-index:5;}
+.badge.ad{left:auto;right:12px;background:rgba(37,99,235,.95);}
+
+/* ✅ 하트 살짝 크게 */
+.heart{
+  position:absolute;top:12px;right:12px;font-size:24px;cursor:pointer;user-select:none;z-index:6;
+  border:none;background:none;padding:0;line-height:1;color:inherit;
+}
+.heart:focus{outline:2px solid rgba(37,99,235,.35); outline-offset:2px; border-radius:10px;}
+.heart.active{color:#ef4444;}
+.card.has-ad .heart{top:44px;}
+
+.content{padding:14px;position:relative;}
+.name{font-weight:950;color:var(--text);padding-right:62px;}
+.desc{font-size:13px;color:var(--muted);margin-top:4px;}
+.addr{font-size:12px;color:var(--muted);margin-top:6px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.views-mini{margin-top:8px;font-size:12px;font-weight:800;color:var(--muted);}
+.detail-btn{
+  position:absolute;right:12px;bottom:12px;
+  padding:8px 10px;border-radius:999px;border:1px solid var(--border);
+  background:var(--card);font-weight:900;font-size:12px;cursor:pointer;color:var(--text);
+}
+.detail-btn:hover{border-color:#cbd5e1}
+
+/* 사이드 */
+.side-card{border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 30px rgba(15,23,42,.08);overflow:hidden;}
+.side-title{padding:14px;font-weight:900;border-bottom:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.side-title .count{font-size:12px;font-weight:950;color:var(--muted);}
+.side-list{padding:14px;font-size:13px;line-height:1.6;color:var(--muted);}
+.saved-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 10px;border:1px solid var(--border);border-radius:14px;margin-bottom:8px;
+  background:var(--card);cursor:pointer;gap:10px;
+}
+.saved-item:hover{border-color:#cbd5e1}
+.saved-item .left{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+.saved-item .t{font-weight:900;color:var(--text);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.saved-item .s{font-weight:700;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.saved-item .right{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+.saved-item .go{font-weight:900;color:#2563eb;font-size:12px;}
+.saved-item .x{
+  width:28px;height:28px;border-radius:10px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-weight:950;cursor:pointer;line-height:1;
+}
+.saved-item .x:hover{border-color:#cbd5e1}
+
+.side-actions{display:flex;gap:8px;padding:0 14px 14px;}
+.small-btn{
+  flex:1;padding:10px 12px;border-radius:14px;border:1px solid var(--border);
+  background:var(--card);font-weight:900;cursor:pointer;color:var(--text);
+}
+.small-btn.primary{border-color:#2563eb;color:#2563eb;}
+.small-btn:hover{border-color:#cbd5e1}
+.side-mini-link{
+  padding:0 14px 14px;
+  font-size:12px;font-weight:900;color:var(--muted);
+}
+.side-mini-link button{
+  border:none;background:none;color:#2563eb;font-weight:950;cursor:pointer;padding:0;margin-left:6px;
+}
+
+/* 모달 */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:50;}
+.modal-box{background:var(--card);padding:22px;border-radius:18px;width:320px;box-shadow:0 18px 55px rgba(15,23,42,.2);border:1px solid var(--border);}
+.modal-box h3{font-size:16px;margin-bottom:10px;color:var(--text);}
+.modal-box input,.modal-box select,.modal-box textarea{
+  width:100%;padding:10px;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);
+  font-weight:700;background:var(--card);color:var(--text);
+}
+.modal-box textarea{resize:none;min-height:72px}
+.modal-box button{width:100%;padding:10px;background:#2563eb;color:#fff;border:none;font-weight:900;border-radius:12px;cursor:pointer;}
+.modal-row{display:flex;gap:8px;margin-top:8px;}
+.modal-row button{width:100%;}
+.btn-ghost{background:var(--card) !important;color:var(--text) !important;border:1px solid var(--border) !important;}
+.hidden{display:none !important;}
+
+.toast{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+  background:rgba(15,23,42,.92);color:#fff;padding:10px 14px;border-radius:999px;
+  font-weight:900;font-size:13px;z-index:80;box-shadow:0 16px 40px rgba(0,0,0,.25);
+  opacity:0;pointer-events:none;transition:.18s;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+.footer{
+  max-width:1200px;margin:0 auto;
+  padding:14px 22px 40px;
+  color:var(--muted);
+  font-size:12px;font-weight:800;
+  display:flex;flex-wrap:wrap;gap:10px;
+  align-items:center;justify-content:space-between;
+}
+.footer .left{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.footer .pill{
+  padding:8px 10px;border-radius:999px;border:1px solid var(--border);
+  background:var(--card);font-weight:900;font-size:12px;color:var(--text);
+}
+.footer button{
+  border:none;background:none;color:#2563eb;font-weight:950;cursor:pointer;padding:0;
+}
+
+@media(max-width:900px){
+  .container{grid-template-columns:1fr;}
+  .topbar-inner{align-items:flex-start;}
+  .grid{grid-template-columns:repeat(2,1fr);}
+}
+
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr;}
+  .banner-actions{flex-direction:column;align-items:stretch;}
+
+  /* ✅ 상단: 1줄(동네맛집) + 2줄(4버튼 한줄) */
+  .topbar-inner{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    align-items:center;
+  }
+
+  .brand{justify-self:start;}
+  .brand-text{font-size:20px;} /* 동네맛집 크게 */
+
+  .top-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:6px; /* 버튼 간격 조금만 */
+  }
+
+  /* 버튼 크기(조금 작게, 터치영역은 유지) */
+  .nick-btn,.contact-btn,.share-btn,.dark-btn{
+    width:100%;
+    padding:9px 8px;
+    font-size:12px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+  }
+
+  /* 문의 살짝 강조 */
+  .contact-btn{
+    background:rgba(37,99,235,.10);
+    border-color:#2563eb;
+    color:#2563eb;
+  }
+
+  /* 모바일 라벨: 문의/닉은 짧은 텍스트, 공유/다크는 아이콘만 */
+  .btn-label-long{display:none;}
+  .btn-label-short{display:inline;}
+
+  /* 공유/다크는 아이콘만 보이게 */
+  .share-btn .btn-label-short,
+  .dark-btn .btn-label-short{
+    font-size:16px;
+    line-height:1;
+  }
+
+  /* ✅ 모바일: 카드 조회수 숨김 + 상세 버튼 숨김(B) */
+  .views-mini{display:none;}
+  .detail-btn{display:none;}
+}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s7-4.6 7-11a7 7 0 0 0-14 0c0 6.4 7 11 7 11z"
+                stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+          <path d="M12 11.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+                stroke="currentColor" stroke-width="2.2"/>
+        </svg>
+      </div>
+      <div class="brand-text">동네맛집</div>
+    </div>
+
+    <div class="top-actions">
+      <!-- 문의(텍스트) -->
+      <button class="contact-btn" id="contactBtn" title="가게 제보/홍보 문의" type="button">
+        <span class="btn-label-long">문의</span>
+        <span class="btn-label-short">💬 문의</span>
+      </button>
+
+      <!-- 닉네임(텍스트) -->
+      <button class="nick-btn" id="nickBtn" type="button">
+        <span class="btn-label-long" id="nickLabelLong">닉네임</span>
+        <span class="btn-label-short" id="nickLabelShort">🙂 닉</span>
+      </button>
+
+      <!-- 공유(아이콘) -->
+      <button class="share-btn" id="shareBtn" title="공유" type="button" aria-label="공유">
+        <span class="btn-label-long">공유</span>
+        <span class="btn-label-short">🔗</span>
+      </button>
+
+      <!-- 다크(아이콘) -->
+      <button class="dark-btn" id="darkBtn" title="다크모드" type="button" aria-label="다크모드">
+        <span class="btn-label-long">다크</span>
+        <span class="btn-label-short">🌙</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+<section>
+  <div class="page-hero">
+    <div class="page-title">면목동 맛집</div>
+    <div class="subtitle">
+      면목동 주민이 직접 고른 동네 맛집 · 광고는 <b>“광고”</b>로 표시합니다<br>
+      <span style="font-size:12px;">✅ 수시 업데이트 · ✅ 제보 환영(상단 ‘문의’)</span>
+    </div>
+
+    <div class="controls">
+      <div class="search"><input id="searchInput" placeholder="국밥, 초밥, 술집…" /></div>
+
+      <div class="sort">
+        <select id="sortSelect" title="정렬">
+          <option value="new">기본순</option>
+          <option value="popular">내 기기 인기순</option>
+        </select>
+      </div>
+
+      <div class="pill-row">
+        <button class="pill active" data-filter="all" type="button">전체</button>
+        <button class="pill" data-filter="한식" type="button">한식</button>
+        <button class="pill" data-filter="일식" type="button">일식</button>
+        <button class="pill" data-filter="중식" type="button">중식</button>
+        <button class="pill" data-filter="고기" type="button">고기</button>
+        <button class="pill" data-filter="카페" type="button">카페</button>
+        <button class="pill" data-filter="술집" type="button">술집</button>
+      </div>
+    </div>
+
+    <div class="banner" id="topBanner">
+      <div class="banner-inner">
+        <div class="banner-left">
+          <div class="banner-badge" id="bannerBadge" aria-hidden="true"></div>
+          <div class="banner-text">
+            <div class="banner-tag">
+              동네 가게 추천 <span class="ad-chip" id="bannerAdChip">광고</span>
+            </div>
+            <div class="banner-title" id="bannerTitle">배너 자리 (홍보 들어오면 여기!)</div>
+            <div class="banner-sub" id="bannerSub">가게명 · 한 줄 소개 · 이벤트</div>
+          </div>
+        </div>
+
+        <!-- ✅ 배너: CTA 하나만(문의) -->
+        <div class="banner-actions">
+          <button class="banner-mini" id="bannerAskBtn" title="문의" type="button">문의</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cardsGrid" class="grid"></div>
+</section>
+
+<aside>
+  <div class="side-card">
+    <div class="side-title">
+      <span>❤️ 내가 찜한 맛집</span>
+      <span class="count" id="savedCount">0개</span>
+    </div>
+
+    <div id="savedList" class="side-list">아직 없음</div>
+
+    <div class="side-actions">
+      <button class="small-btn primary" id="aboutBtn" type="button">소개</button>
+      <button class="small-btn" id="clearSavedBtn" type="button">전체 비우기</button>
+    </div>
+
+    <div class="side-mini-link">
+      가게 제보/광고 문의는
+      <button id="sideContactBtn" type="button">여기</button>
+    </div>
+  </div>
+</aside>
+</main>
+
+<footer class="footer">
+  <div class="left">
+    <span class="pill">운영: 동네맛집</span>
+    <span class="pill">문의: 오픈채팅</span>
+    <span>※ 닉네임/찜/조회수는 이 기기(브라우저)에만 저장됩니다.</span>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <button id="footerPolicyBtn" type="button">개인정보 안내</button>
+    <button id="footerAdBtn" type="button">광고 표기</button>
+    <button id="footerShareBtn" type="button">링크 복사</button>
+  </div>
+</footer>
+
+<!-- 닉네임 -->
+<div id="nickModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>닉네임 설정</h3>
+    <input id="nickInput" placeholder="닉네임 입력">
+    <button id="saveNick" type="button">저장</button>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeNick" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 소개 -->
+<div id="aboutModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>소개</h3>
+    <div class="form-note">
+      • 동네에서 자주 찾는 맛집을 모아두는 페이지예요.<br>
+      • 회원가입 없이 사용 가능해요.<br>
+      • 닉네임/찜/조회수는 <b>이 기기(브라우저)</b>에만 저장돼요.<br>
+      • 등록/제보/홍보는 “가게명/주소/대표메뉴/사진(있으면)” 보내주면 돼요.
+    </div>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeAbout" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공유 -->
+<div id="shareModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>공유</h3>
+    <div class="form-note">
+      아래 버튼을 누르면 <b>현재 페이지 주소</b>가 복사돼요.
+    </div>
+    <button id="copyLinkBtn" type="button">링크 복사</button>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeShare" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 문의 -->
+<div id="contactModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>가게 제보 / 홍보 문의</h3>
+    <div class="form-note">
+      📍 면목동/사가정 주변 가게만 받아요.<br><br>
+      💬 오픈채팅으로 문의해주세요.<br><br>
+      보내실 것:<br>
+      • 가게명 / 주소 / 대표메뉴 / 사진(있으면)<br>
+      • 원하시는 기간(7일/30일)
+    </div>
+    <button id="openKakaoBtn" type="button">카카오 오픈채팅 열기</button>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeContact" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 맛집 상세 -->
+<div id="detailModal" class="modal hidden">
+  <div class="modal-box">
+    <h3 id="detailTitle">맛집 상세</h3>
+    <div class="form-note" id="detailMeta" style="margin-bottom:10px;"></div>
+    <div class="form-note" id="detailDesc" style="margin-bottom:10px;"></div>
+    <div class="form-note" id="detailAddr" style="margin-bottom:10px;"></div>
+    <div class="modal-row">
+      <button id="detailOpenMap" type="button">네이버지도 열기</button>
+      <button class="btn-ghost" id="detailCopyAddr" type="button">주소 복사</button>
+    </div>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeDetail" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 개인정보 안내 -->
+<div id="policyModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>개인정보 안내</h3>
+    <div class="form-note">
+      • 이 페이지는 회원가입 없이 사용할 수 있어요.<br>
+      • 닉네임/찜/조회수는 서버로 전송되지 않고, <b>이 기기(브라우저)</b>에만 저장돼요.<br>
+      • 문의는 외부 오픈채팅으로 연결돼요(해당 서비스의 정책을 따릅니다).
+    </div>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closePolicy" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 광고 표기 -->
+<div id="adModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>광고 표기</h3>
+    <div class="form-note">
+      • 광고/스폰서로 등록된 가게는 카드 또는 배너에 <b>“광고”</b> 표기가 표시됩니다.<br>
+      • 일반 추천과 광고는 표기로 구분합니다.
+    </div>
+    <div class="modal-row">
+      <button class="btn-ghost" id="closeAd" type="button">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">저장됨</div>
+
+<script>
+/* 문의 링크 */
+const CONTACT_KAKAO = "https://open.kakao.com/o/gRmo49di";
+
+/* 로컬 저장키(개인 기능만) */
+const LS_SAVED  = "saved_v2";
+const LS_NICK   = "nick";
+const LS_DARK   = "dark_v1";
+const LS_VIEWS  = "views_v1";
+
+/* ✅ 고정 데이터(1단계) */
+const DEFAULT_PLACES = [
+  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"", addr:"", sponsor:false, sponsorUntil:""}
+];
+
+/* 배너(1단계 고정) */
+let banner = {title:"배너 자리 (홍보 들어오면 여기!)", sub:"가게명 · 한 줄 소개 · 이벤트", link:"", isAd:true};
+
+let filter="all", q="";
+let sortMode="new";
+let places = [...DEFAULT_PLACES];
+
+let savedIds = loadSavedIds();
+let views = loadViews();
+
+/* ====== DOM ====== */
+const grid=document.getElementById("cardsGrid");
+const savedList=document.getElementById("savedList");
+const savedCount=document.getElementById("savedCount");
+
+/* 토스트 */
+const toast = document.getElementById("toast");
+let toastTimer=null;
+function showToast(msg){
+  toast.textContent=msg;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"),1200);
+}
+
+/* 유틸 */
+function esc(s){ return String(s||"").replace(/[&<>"]/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[m])); }
+
+/* ====== 로컬 저장 ====== */
+function loadSavedIds(){
+  const v2=localStorage.getItem(LS_SAVED);
+  if(v2){
+    try{ const arr=JSON.parse(v2); if(Array.isArray(arr)) return arr; }catch(e){}
+  }
+  localStorage.setItem(LS_SAVED, JSON.stringify([]));
+  return [];
+}
+function saveSavedIds(){ localStorage.setItem(LS_SAVED, JSON.stringify(savedIds)); }
+
+function loadViews(){
+  const raw = localStorage.getItem(LS_VIEWS);
+  if(!raw){
+    localStorage.setItem(LS_VIEWS, JSON.stringify({}));
+    return {};
+  }
+  try{
+    const obj = JSON.parse(raw);
+    if(obj && typeof obj === "object") return obj;
+  }catch(e){}
+  localStorage.setItem(LS_VIEWS, JSON.stringify({}));
+  return {};
+}
+function saveViews(){ localStorage.setItem(LS_VIEWS, JSON.stringify(views)); }
+function incView(id){
+  views[id] = (views[id]||0) + 1;
+  saveViews();
+}
+
+/* ====== 다크모드 ====== */
+const darkBtn = document.getElementById("darkBtn");
+function applyDarkFromStorage(){
+  const v = localStorage.getItem(LS_DARK);
+  if(v === "1") document.body.classList.add("dark");
+}
+function setDarkSave(){
+  localStorage.setItem(LS_DARK, document.body.classList.contains("dark") ? "1" : "0");
+}
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  setDarkSave();
+  rerenderAll();
+}
+darkBtn.onclick = toggleDark;
+applyDarkFromStorage();
+
+/* ====== SVG 일러스트(사진 없을 때) ====== */
+const PALETTES = [
+  {a:"#2563eb", b:"#22c55e", bg:"#eef2ff"},
+  {a:"#ef4444", b:"#f59e0b", bg:"#fff7ed"},
+  {a:"#8b5cf6", b:"#06b6d4", bg:"#f5f3ff"},
+  {a:"#10b981", b:"#2563eb", bg:"#ecfeff"},
+  {a:"#f97316", b:"#22c55e", bg:"#fefce8"},
+  {a:"#0ea5e9", b:"#a855f7", bg:"#eff6ff"},
+];
+function hashString(str){
+  let h=2166136261;
+  for(let i=0;i<str.length;i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h>>>0);
+}
+function pickPalette(seed){
+  const idx = seed % PALETTES.length;
+  return PALETTES[idx];
+}
+function catIconSVG(cat, stroke){
+  const c = cat || "default";
+  const s = stroke || "#0f172a";
+  const common = `fill="none" stroke="${s}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"`;
+  if(c==="카페"){
+    return `<svg viewBox="0 0 24 24">
+      <path ${common} d="M7 8h10v6a5 5 0 0 1-5 5H10a3 3 0 0 1-3-3V8z"/>
+      <path ${common} d="M17 9h2a2 2 0 0 1 0 4h-2"/>
+      <path ${common} d="M8 3c0 2 2 2 2 4M12 3c0 2 2 2 2 4M16 3c0 2 2 2 2 4"/>
+    </svg>`;
+  }
+  if(c==="술집"){
+    return `<svg viewBox="0 0 24 24">
+      <path ${common} d="M7 3h10l-1 8a4 4 0 0 1-4 3H12a4 4 0 0 1-4-3L7 3z"/>
+      <path ${common} d="M9 21h6"/>
+      <path ${common} d="M12 14v7"/>
+      <path ${common} d="M8 7h8"/>
+    </svg>`;
+  }
+  if(c==="고기"){
+    return `<svg viewBox="0 0 24 24">
+      <path ${common} d="M6 12c0-4 3-7 7-7 3 0 5 2 5 5 0 4-3 9-9 9-2 0-3-1-3-2 0-2 1-3 3-5z"/>
+      <path ${common} d="M14 9c.8 0 1.5.7 1.5 1.5S14.8 12 14 12s-1.5-.7-1.5-1.5S13.2 9 14 9z"/>
+    </svg>`;
+  }
+  if(c==="일식"){
+    return `<svg viewBox="0 0 24 24">
+      <path ${common} d="M7 14c2-2 8-2 10 0s-2 7-5 7-7-5-5-7z"/>
+      <path ${common} d="M9 13c0-3 6-3 6 0"/>
+      <path ${common} d="M5 9h14"/>
+    </svg>`;
+  }
+  if(c==="중식"){
+    return `<svg viewBox="0 0 24 24">
+      <path ${common} d="M6 9h12l-1 9H7L6 9z"/>
+      <path ${common} d="M9 9c0-2 1-3 3-3s3 1 3 3"/>
+      <path ${common} d="M8 18h8"/>
+    </svg>`;
+  }
+  return `<svg viewBox="0 0 24 24">
+    <path ${common} d="M6 10c0-2 2-4 6-4s6 2 6 4v4c0 4-3 7-6 7s-6-3-6-7v-4z"/>
+    <path ${common} d="M8 10h8"/>
+    <path ${common} d="M9 3c0 2 2 2 2 4M13 3c0 2 2 2 2 4"/>
+  </svg>`;
+}
+function cardIllustrationSVG(place){
+  const name = place?.name || "place";
+  const cat  = place?.cat || "한식";
+  const seed = hashString(name + "|" + cat);
+  const pal  = pickPalette(seed);
+  const a = pal.a, b = pal.b, bg = pal.bg;
+  const iconStroke = (document.body.classList.contains("dark") ? "#e2e8f0" : "#0f172a");
+  const icon = catIconSVG(cat, iconStroke);
+
+  const t1 = esc(name);
+  const t2 = esc(place?.desc || "");
+  return `
+  <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t1}">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${a}" stop-opacity=".18"/>
+        <stop offset="1" stop-color="${b}" stop-opacity=".18"/>
+      </linearGradient>
+      <radialGradient id="r" cx="30%" cy="20%" r="70%">
+        <stop offset="0" stop-color="${a}" stop-opacity=".22"/>
+        <stop offset="1" stop-color="${bg}" stop-opacity="1"/>
+      </radialGradient>
+      <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="rgba(15,23,42,.18)"/>
+      </filter>
+    </defs>
+    <rect width="800" height="500" fill="url(#r)"/>
+    <rect width="800" height="500" fill="url(#g)"/>
+    <circle cx="90" cy="420" r="140" fill="${a}" opacity=".08"/>
+    <circle cx="720" cy="120" r="160" fill="${b}" opacity=".08"/>
+    <path d="M0 360 C140 320, 260 420, 400 380 C540 340, 650 260, 800 300 L800 500 L0 500 Z"
+      fill="${b}" opacity=".10"/>
+    <g filter="url(#s)">
+      <rect x="250" y="120" width="300" height="220" rx="32" fill="rgba(255,255,255,.65)"/>
+    </g>
+    <g transform="translate(340,165) scale(5)">${icon}</g>
+    <text x="400" y="390" text-anchor="middle" font-size="26" font-weight="900"
+      fill="${document.body.classList.contains("dark") ? "rgba(248,250,252,.92)" : "rgba(15,23,42,.85)"}">${t1}</text>
+    <text x="400" y="420" text-anchor="middle" font-size="16" font-weight="800"
+      fill="${document.body.classList.contains("dark") ? "rgba(148,163,184,.95)" : "rgba(100,116,139,.95)"}">${t2}</text>
+  </svg>`;
+}
+function bannerBadgeSVG(){
+  const stroke = (document.body.classList.contains("dark") ? "#e2e8f0" : "#0f172a");
+  return `
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 13c2.2-1.6 3.8-1.6 6 0s3.8 1.6 6 0" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M6 9.5c2.4-1.8 4.2-1.8 6.6 0 2.4 1.8 4.2 1.8 6.6 0" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+      <path d="M8 17h8" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" opacity=".9"/>
+    </svg>`;
+}
+
+/* ====== 배너 렌더 ====== */
+const bannerTitleEl = document.getElementById("bannerTitle");
+const bannerSubEl = document.getElementById("bannerSub");
+const bannerBadge = document.getElementById("bannerBadge");
+const bannerAdChip = document.getElementById("bannerAdChip");
+const bannerAskBtn = document.getElementById("bannerAskBtn");
+
+function renderBanner(){
+  bannerTitleEl.textContent = banner.title;
+  bannerSubEl.textContent = banner.sub;
+  bannerBadge.innerHTML = bannerBadgeSVG();
+  bannerAdChip.style.display = banner.isAd ? "inline-block" : "none";
+}
+renderBanner();
+bannerAskBtn.onclick = ()=> openContact();
+
+/* ====== 스폰서(광고) ====== */
+function isSponsorActive(p){
+  if(!p || !p.sponsor) return false;
+  const until = (p.sponsorUntil||"").trim();
+  if(!until) return true;
+  const today = new Date();
+  const end = new Date(until + "T23:59:59");
+  return end.getTime() >= today.getTime();
+}
+
+/* ====== 상세 모달 ====== */
+const detailModal = document.getElementById("detailModal");
+const detailTitle = document.getElementById("detailTitle");
+const detailMeta  = document.getElementById("detailMeta");
+const detailDesc  = document.getElementById("detailDesc");
+const detailAddr  = document.getElementById("detailAddr");
+const detailOpenMap = document.getElementById("detailOpenMap");
+const detailCopyAddr = document.getElementById("detailCopyAddr");
+const closeDetail = document.getElementById("closeDetail");
+let currentDetailPlace = null;
+
+function openDetail(place){
+  currentDetailPlace = place;
+  incView(place.id);
+
+  detailTitle.textContent = place.name || "맛집 상세";
+  const v = views[place.id] || 0;
+  const sponsorText = isSponsorActive(place) ? " · 광고" : "";
+  detailMeta.innerHTML = `카테고리: <b>${esc(place.cat||"")}</b>${sponsorText}<br>조회수(내 기기): <b>${v}</b>`;
+  detailDesc.textContent = place.desc ? ("소개: " + place.desc) : "소개: (없음)";
+  detailAddr.textContent = (place.addr && place.addr.trim()) ? ("주소: " + place.addr) : "주소: (없음)";
+  detailModal.classList.remove("hidden");
+}
+closeDetail.onclick = ()=> detailModal.classList.add("hidden");
+detailOpenMap.onclick = ()=>{
+  if(!currentDetailPlace) return;
+  const p = currentDetailPlace;
+  const query=(p.addr&&p.addr.trim()) ? (p.name+" "+p.addr) : p.name;
+  const url="https://map.naver.com/v5/search/"+encodeURIComponent(query);
+  window.open(url,"_blank","noopener,noreferrer");
+};
+detailCopyAddr.onclick = ()=>{
+  if(!currentDetailPlace) return;
+  const addr = (currentDetailPlace.addr||"").trim();
+  if(!addr) return showToast("주소가 없어요");
+  navigator.clipboard?.writeText(addr).then(()=>showToast("주소 복사됨")).catch(()=>window.prompt("복사해서 쓰세요", addr));
+};
+
+/* ====== 렌더 ====== */
+function buildList(){
+  let list = places.filter(p=>{
+    const text=(p.name+" "+(p.desc||"")+" "+(p.cat||"")+" "+(p.addr||"")).toLowerCase();
+    return (filter==="all"||p.cat===filter)&&(!q||text.includes(q));
+  });
+
+  if(sortMode==="popular"){
+    list = list.slice().sort((a,b)=> (views[b.id]||0) - (views[a.id]||0));
+  }else{
+    list = list.slice();
+  }
+  return list;
+}
+function shouldShowPhoto(p){
+  const img = (p.img||"").trim();
+  return !!img;
+}
+
+function render(){
+  grid.innerHTML="";
+  const list = buildList();
+
+  list.forEach(p=>{
+    const isSaved=savedIds.includes(p.id);
+    const sponsorActive = isSponsorActive(p);
+    const card=document.createElement("div");
+    card.className="card" + (sponsorActive ? " has-ad" : "");
+    card.id="card-"+p.id;
+
+    const svg = cardIllustrationSVG(p);
+    const v = views[p.id]||0;
+
+    const img = (p.img||"").trim();
+    const hasPhoto = shouldShowPhoto(p);
+
+    card.innerHTML=`
+      <div class="thumb">
+        ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
+        <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
+        <div class="img-overlay"></div>
+
+        <div class="badge">${esc(p.cat)}</div>
+        ${sponsorActive ? `<div class="badge ad">광고</div>` : ``}
+        <button class="heart ${isSaved?"active":""}" title="찜" type="button" aria-label="찜">❤</button>
+      </div>
+      <div class="content">
+        <div class="name">${esc(p.name)}</div>
+        <div class="desc">${esc(p.desc||"")}</div>
+        ${p.addr && p.addr.trim() ? `<div class="addr">📍 ${esc(p.addr)}</div>` : ``}
+        <div class="views-mini">조회수(내 기기) ${v}</div>
+        <button class="detail-btn" data-id="${p.id}" title="상세" type="button">상세</button>
+      </div>
+    `;
+
+    card.querySelector(".heart").onclick=(e)=>{
+      e.stopPropagation();
+      if(isSaved){
+        savedIds=savedIds.filter(id=>id!==p.id);
+        showToast("찜 해제됨");
+      }else{
+        savedIds.push(p.id);
+        showToast("저장됨");
+      }
+      saveSavedIds();
+      renderSaved();
+      render();
+    };
+
+    card.querySelector(".detail-btn").onclick=(e)=>{
+      e.stopPropagation();
+      openDetail(p);
+      render();
+    };
+
+    card.onclick=()=>{
+      openDetail(p);
+      render();
+    };
+
+    grid.appendChild(card);
+  });
+
+  if(list.length===0){
+    const empty=document.createElement("div");
+    empty.style.cssText="grid-column:1/-1;padding:18px;border:1px dashed #cbd5e1;border-radius:18px;background:var(--card);color:var(--muted);font-weight:900;text-align:center;";
+    empty.textContent="검색 결과가 없어요 🙂";
+    grid.appendChild(empty);
+  }
+}
+
+/* ====== 찜 목록 ====== */
+function renderSaved(){
+  const savedPlaces=savedIds.map(id=>places.find(p=>p.id===id)).filter(Boolean);
+  savedCount.textContent = savedPlaces.length + "개";
+
+  if(savedPlaces.length===0){
+    savedList.textContent="아직 없음";
+    return;
+  }
+  savedList.innerHTML=savedPlaces.map(p=>`
+    <div class="saved-item" data-id="${p.id}">
+      <div class="left">
+        <div class="t">${esc(p.name)}</div>
+        <div class="s">${esc(p.cat)} · ${esc(p.desc||"")}</div>
+      </div>
+      <div class="right">
+        <div class="go">열기</div>
+        <button class="x" data-x="${p.id}" title="찜 해제" type="button">✕</button>
+      </div>
+    </div>
+  `).join("");
+
+  savedList.querySelectorAll(".saved-item").forEach(el=>{
+    el.onclick=(e)=>{
+      if(e.target && e.target.dataset && e.target.dataset.x) return;
+      const id=el.dataset.id;
+      const p = places.find(x=>x.id===id);
+      if(p){
+        openDetail(p);
+        render();
+        showToast("상세 열림");
+      }
+    };
+  });
+
+  savedList.querySelectorAll("button.x").forEach(btn=>{
+    btn.onclick=(e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.x;
+      savedIds = savedIds.filter(x=>x!==id);
+      saveSavedIds();
+      renderSaved();
+      render();
+      showToast("찜 해제됨");
+    };
+  });
+}
+
+/* ====== 검색/필터/정렬 ====== */
+const searchInput=document.getElementById("searchInput");
+searchInput.oninput=e=>{ q=(e.target.value||"").trim().toLowerCase(); render(); };
+
+document.querySelectorAll(".pill").forEach(p=>{
+  p.onclick=()=>{
+    document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
+    p.classList.add("active");
+    filter=p.dataset.filter;
+    render();
+  };
+});
+
+const sortSelect = document.getElementById("sortSelect");
+sortSelect.onchange = (e)=>{
+  sortMode = e.target.value;
+  render();
+};
+
+/* ====== 닉네임 ====== */
+const nickBtn=document.getElementById("nickBtn");
+const nickLabelLong=document.getElementById("nickLabelLong");
+const nickLabelShort=document.getElementById("nickLabelShort");
+
+const nickModal=document.getElementById("nickModal");
+const nickInput=document.getElementById("nickInput");
+const saveNick=document.getElementById("saveNick");
+const closeNick=document.getElementById("closeNick");
+
+function setNickLabels(v){
+  const name = (v||"").trim();
+  if(!name){
+    nickLabelLong.textContent = "닉네임";
+    nickLabelShort.textContent = "🙂 닉";
+    return;
+  }
+  nickLabelLong.textContent = name + "님";
+  const cut = name.length > 4 ? (name.slice(0,4) + "…") : name;
+  nickLabelShort.textContent = "🙂 " + cut;
+}
+nickBtn.onclick=()=>nickModal.classList.remove("hidden");
+closeNick.onclick=()=>nickModal.classList.add("hidden");
+saveNick.onclick=()=>{
+  const v=(nickInput.value||"").trim();
+  if(!v) return showToast("닉네임을 입력하세요");
+  localStorage.setItem(LS_NICK, v);
+  setNickLabels(v);
+  nickModal.classList.add("hidden");
+  showToast("닉네임 저장됨");
+};
+setNickLabels(localStorage.getItem(LS_NICK));
+
+/* ====== 모달 공통 닫기 ====== */
+function bindModalClose(modalEl, closeFn){
+  modalEl.addEventListener("click",(e)=>{ if(e.target===modalEl) closeFn(); });
+}
+const aboutBtn=document.getElementById("aboutBtn");
+const aboutModal=document.getElementById("aboutModal");
+const closeAbout=document.getElementById("closeAbout");
+aboutBtn.onclick=()=>aboutModal.classList.remove("hidden");
+closeAbout.onclick=()=>aboutModal.classList.add("hidden");
+
+bindModalClose(nickModal, ()=>nickModal.classList.add("hidden"));
+bindModalClose(aboutModal, ()=>aboutModal.classList.add("hidden"));
+bindModalClose(detailModal, ()=>detailModal.classList.add("hidden"));
+
+/* 개인정보/광고 모달 */
+const policyModal = document.getElementById("policyModal");
+const adModal = document.getElementById("adModal");
+const footerPolicyBtn = document.getElementById("footerPolicyBtn");
+const footerAdBtn = document.getElementById("footerAdBtn");
+const closePolicy = document.getElementById("closePolicy");
+const closeAd = document.getElementById("closeAd");
+footerPolicyBtn.onclick = ()=> policyModal.classList.remove("hidden");
+footerAdBtn.onclick = ()=> adModal.classList.remove("hidden");
+closePolicy.onclick = ()=> policyModal.classList.add("hidden");
+closeAd.onclick = ()=> adModal.classList.add("hidden");
+bindModalClose(policyModal, ()=>policyModal.classList.add("hidden"));
+bindModalClose(adModal, ()=>adModal.classList.add("hidden"));
+
+/* ====== 공유 ====== */
+const shareBtn = document.getElementById("shareBtn");
+const shareModal = document.getElementById("shareModal");
+const closeShare = document.getElementById("closeShare");
+const copyLinkBtn = document.getElementById("copyLinkBtn");
+const footerShareBtn = document.getElementById("footerShareBtn");
+
+function copyLink(){
+  const url = location.href;
+  navigator.clipboard?.writeText(url).then(()=>showToast("링크 복사됨")).catch(()=>{
+    window.prompt("아래 링크를 복사하세요", url);
+  });
+}
+shareBtn.onclick = ()=> shareModal.classList.remove("hidden");
+closeShare.onclick = ()=> shareModal.classList.add("hidden");
+bindModalClose(shareModal, ()=>shareModal.classList.add("hidden"));
+copyLinkBtn.onclick = copyLink;
+footerShareBtn.onclick = copyLink;
+
+/* ====== 문의 ====== */
+const contactBtn = document.getElementById("contactBtn");
+const contactModal = document.getElementById("contactModal");
+const closeContact = document.getElementById("closeContact");
+const openKakaoBtn = document.getElementById("openKakaoBtn");
+const sideContactBtn = document.getElementById("sideContactBtn");
+
+function openContact(){ contactModal.classList.remove("hidden"); }
+contactBtn.onclick = openContact;
+sideContactBtn.onclick = openContact;
+closeContact.onclick = ()=> contactModal.classList.add("hidden");
+bindModalClose(contactModal, ()=>contactModal.classList.add("hidden"));
+openKakaoBtn.onclick = ()=> window.open(CONTACT_KAKAO, "_blank", "noopener,noreferrer");
+
+/* ====== 찜 전체 비우기 ====== */
+const clearSavedBtn = document.getElementById("clearSavedBtn");
+clearSavedBtn.onclick = ()=>{
+  if(savedIds.length===0) return showToast("비울 목록이 없어요");
+  if(!confirm("찜 목록을 전부 비울까요?")) return;
+  savedIds = [];
+  saveSavedIds();
+  renderSaved();
+  render();
+  showToast("전체 비움");
+};
+
+/* ✅ ESC 닫기 */
+document.addEventListener("keydown",(e)=>{
+  if(e.key!=="Escape") return;
+  [nickModal, aboutModal, shareModal, contactModal, detailModal, policyModal, adModal]
+    .filter(Boolean)
+    .forEach(m=>m.classList.add("hidden"));
+});
+
+/* ====== 리렌더 ====== */
+function rerenderAll(){
+  renderBanner();
+  render();
+  renderSaved();
+}
+
+/* ====== 초기 ====== */
+render();
+renderSaved();
+</script>
+
+</body>
+</html>
