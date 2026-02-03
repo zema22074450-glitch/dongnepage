@@ -1089,35 +1089,12 @@ function rerenderAll(){
 /* ====== 초기 ====== */
 render();
 renderSaved();
-</script>
-<div id="shopList"></div>
-
-  <script>
-const STORAGE_KEY = "dongne_shops";
-const container = document.getElementById("shopList");
-
-const list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-container.innerHTML = "";
-
-list.forEach(shop => {
-  const card = document.createElement("div");
-  card.className = "card";
-
-  card.innerHTML = `
-    <img src="${shop.image}" onerror="this.style.display='none'">
-    <h3>${shop.name}</h3>
-    <p>${shop.category}</p>
-    ${shop.ad ? '<span class="badge">광고</span>' : ''}
-  `;
-
-  container.appendChild(card);
-});
 
 </script>
 
 </body>
   
 </html>
+
 
 
