@@ -555,7 +555,23 @@ let banner = {title:"배너 자리 (홍보 들어오면 여기!)", sub:"가게�
 
 let filter="all", q="";
 let sortMode="new";
-let places = [...DEFAULT_PLACES];
+const ADMIN_KEY = "dongne_shops";
+
+function loadAdminPlaces(){
+  try{
+    const raw = localStorage.getItem(ADMIN_KEY);
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  }catch(e){
+    return [];
+  }
+}
+
+let places = [
+  ...DEFAULT_PLACES,
+  ...loadAdminPlaces()
+];
+
 
 let savedIds = loadSavedIds();
 let views = loadViews();
@@ -1095,6 +1111,7 @@ renderSaved();
 </body>
   
 </html>
+
 
 
 
