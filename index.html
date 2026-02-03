@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<title>면목동 맛집</title>
+<title>중랑구 맛집</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <!-- ✅ 1단계 오픈용 SEO/공유 기본 세팅 -->
@@ -542,36 +542,24 @@ const LS_VIEWS  = "views_v1";
 
 /* ✅ 고정 데이터(1단계) */
 const DEFAULT_PLACES = [
-  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"", addr:"", sponsor:false, sponsorUntil:""}
+  {id:"d-a", name:"중랑구 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"https://i.imgur.com/3Qo3PQ4.jpg", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-b", name:"중랑구 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"https://i.imgur.com/e7LHDQT.jpeg", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-c", name:"중랑구 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"https://i.imgur.com/YohVLLZ.jpg", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-d", name:"중랑구 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"https://i.imgur.com/C5iuhPk.jpeg", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-e", name:"중랑구 카페", cat:"카페", desc:"커피맛집", img:"https://i.imgur.com/GCFu59r.jpg", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-f", name:"중랑구 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"https://i.imgur.com/8upBmbL.jpg", addr:"", sponsor:false, sponsorUntil:""},
+
+  // ✅ 여기! 마지막 쉼표 중요
+
 ];
+
 
 /* 배너(1단계 고정) */
 let banner = {title:"배너 자리 (홍보 들어오면 여기!)", sub:"가게명 · 한 줄 소개 · 이벤트", link:"", isAd:true};
 
 let filter="all", q="";
 let sortMode="new";
-const ADMIN_KEY = "dongne_shops";
-
-function loadAdminPlaces(){
-  try{
-    const raw = localStorage.getItem(ADMIN_KEY);
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr : [];
-  }catch(e){
-    return [];
-  }
-}
-
-let places = [
-  ...DEFAULT_PLACES,
-  ...loadAdminPlaces()
-];
-
+let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || [...DEFAULT_PLACES];
 
 let savedIds = loadSavedIds();
 let views = loadViews();
@@ -1105,13 +1093,7 @@ function rerenderAll(){
 /* ====== 초기 ====== */
 render();
 renderSaved();
-
 </script>
 
 </body>
-  
 </html>
-
-
-
-
