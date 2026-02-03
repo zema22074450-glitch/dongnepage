@@ -1090,7 +1090,9 @@ function rerenderAll(){
 render();
 renderSaved();
 </script>
-<script>
+<div id="shopList"></div>
+
+  <script>
 const STORAGE_KEY = "dongne_shops";
 const container = document.getElementById("shopList");
 
@@ -1111,8 +1113,11 @@ list.forEach(shop => {
 
   container.appendChild(card);
 });
+
 </script>
 
 </body>
+  
 </html>
+
 
