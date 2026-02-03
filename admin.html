@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>관리자 도구 Pro | 동네맛집</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root { --primary:#2563eb; --danger:#ef4444; --bg:#f8fafc; --card:#fff; --border:#e2e8f0; --text:#334155; }
+body{margin:0;font-family:Pretendard,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}
+button{border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer; transition:.2s}
+button:hover{opacity:.85}
+.btn-main{background:var(--primary);color:#fff}
+.btn-sub{background:#e2e8f0}
+.btn-del{background:#fee2e2;color:var(--danger)}
+.btn-outline{background:transparent;border:1px solid var(--border)}
+
+.admin-bar{position:sticky;top:0;z-index:10;background:#fff;padding:12px 20px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border)}
+.search-box{flex:1;max-width:400px}
+.search-box input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px}
+
+.grid{padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.05)}
+.card img{width:100%;height:160px;object-fit:cover;background:#f1f5f9}
+
+.panel{position:fixed;right:0;top:0;width:100%;max-width:420px;height:100%;background:#fff;z-index:20;padding:24px;overflow:auto;box-shadow:-4px 0 15px rgba(0,0,0,.1)}
+.panel input,.panel select,.panel textarea{margin-bottom:14px;width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px}
+.preview-box{width:100%;height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:10px;object-fit:cover}
+
+#loginBox{max-width:360px;margin:15vh auto;padding:40px;background:#fff;border-radius:20px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.1)}
+.util-btns{padding:0 20px;display:flex;gap:10px;justify-content:flex-end}
+</style>
+</head>
+<body>
+
+<div id="loginBox">
+  <h2>Admin Access</h2>
+  <input id="loginId" placeholder="아이디">
+  <input id="loginPw" type="password" placeholder="비밀번호">
+  <button class="btn-main" style="width:100%" onclick="handleLogin()">로그인</button>
+</div>
+
+<div id="admin" class="hidden">
+  <div class="admin-bar">
+    <b>🍽 Local Admin</b>
+    <div class="search-box">
+      <input id="keyword" placeholder="가게 이름 검색" oninput="render()">
+    </div>
+    <button class="btn-main" onclick="openEdit()">+ 추가</button>
+    <button class="btn-sub" onclick="handleLogout()">로그아웃</button>
+  </div>
+
+  <div class="util-btns" style="margin-top:16px">
+    <button class="btn-outline" onclick="exportData()">💾 백업</button>
+    <button class="btn-outline" onclick="importFile.click()">📂 복구</button>
+    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)">
+  </div>
+
+  <div class="grid" id="list"></div>
+</div>
+
+<div id="editPanel" class="panel hidden">
+  <h3 id="panelHeader"></h3>
+  <img id="imgPrev" class="preview-box">
+  <input id="fid" readonly>
+  <input id="fname" placeholder="가게명 *">
+  <select id="fcat"></select>
+
+  <input type="file" id="fileInput" accept="image/*" onchange="handleImgUpload(event)">
+  <input id="fimg" placeholder="이미지 URL" oninput="updatePreview()">
+
+  <textarea id="fdesc" rows="3" placeholder="소개"></textarea>
+
+  <div style="display:flex;gap:8px;align-items:center">
+    <label><input type="checkbox" id="fad"> 광고</label>
+    <input type="date" id="funtil" style="flex:1">
+  </div>
+
+  <button class="btn-main" style="width:100%" onclick="handleSave()">저장</button>
+  <button class="btn-sub" style="width:100%" onclick="closeAll()">취소</button>
+  <button class="btn-del" id="delBtn" style="width:100%" onclick="handleDelete()">삭제</button>
+</div>
+
+<script>
+/* ===== 설정 ===== */
+const ADMIN_ID="admin", ADMIN_PW="1234";
+const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"RESTAURANT_LIST",CAT:"CATEGORY_LIST"};
+const DEFAULT_CATS=["한식","일식","중식","양식","카페","기타"];
+const LOGIN_LIMIT=1000*60*60*24;
+
+/* ===== 로그인 ===== */
+function handleLogin(){
+  if(loginId.value===ADMIN_ID&&loginPw.value===ADMIN_PW){
+    localStorage.setItem(DB.AUTH,Date.now());init();
+  } else alert("로그인 실패");
+}
+function handleLogout(){
+  localStorage.removeItem(DB.AUTH);location.reload();
+}
+function init(){
+  const t=localStorage.getItem(DB.AUTH);
+  if(!t||Date.now()-t>LOGIN_LIMIT){
+    alert("로그인이 만료되었습니다.");
+    localStorage.removeItem(DB.AUTH);
+    return;
+  }
+  loginBox.classList.add("hidden");
+  admin.classList.remove("hidden");
+  if(!localStorage.getItem(DB.CAT)) localStorage.setItem(DB.CAT,JSON.stringify(DEFAULT_CATS));
+  render();
+}
+if(localStorage.getItem(DB.AUTH)) init();
+
+/* ===== 데이터 ===== */
+const getDB=()=>JSON.parse(localStorage.getItem(DB.DATA)||"[]");
+
+/* ===== 렌더 ===== */
+function render(){
+  const word=(keyword.value||"").toLowerCase();
+  list.innerHTML="";
+  getDB().filter(x=>x.name.toLowerCase().includes(word)).forEach(item=>{
+    list.innerHTML+=`
+    <div class="card">
+      <img src="${item.img||'https://via.placeholder.com/300x160?text=No+Image'}">
+      <div style="padding:14px">
+        <b>${item.name}</b>
+        <button class="btn-sub" style="width:100%" onclick="openEditById('${item.id}')">수정</button>
+      </div>
+    </div>`;
+  });
+}
+
+/* ===== 이미지 업로드 ===== */
+function handleImgUpload(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  if(file.size>500*1024) return alert("이미지는 500KB 이하만 허용됩니다.");
+  const r=new FileReader();
+  r.onload=ev=>{fimg.value=ev.target.result;updatePreview();}
+  r.readAsDataURL(file);
+}
+function updatePreview(){
+  imgPrev.src=fimg.value||"https://via.placeholder.com/400x200?text=No+Image";
+}
+
+/* ===== 패널 ===== */
+function openEditById(id){
+  openEdit(getDB().find(x=>x.id===id));
+}
+function openEdit(item=null){
+  fcat.innerHTML=JSON.parse(localStorage.getItem(DB.CAT)).map(c=>`<option>${c}</option>`).join("");
+  editPanel.classList.remove("hidden");
+  delBtn.classList.toggle("hidden",!item);
+  panelHeader.innerText=item?"수정":"추가";
+  fid.value=item?.id||("R"+Date.now()+Math.floor(Math.random()*1000));
+  fname.value=item?.name||"";
+  fcat.value=item?.cat||DEFAULT_CATS[0];
+  fimg.value=item?.img||"";
+  fdesc.value=item?.desc||"";
+  fad.checked=item?.ad||false;
+  funtil.value=item?.until||"";
+  updatePreview();
+}
+function closeAll(){editPanel.classList.add("hidden");fileInput.value="";}
+
+/* ===== 저장 ===== */
+function handleSave(){
+  if(!fname.value.trim()) return alert("가게명 필수");
+  if(fad.checked&&!funtil.value) return alert("광고 종료일 필수");
+  const data=getDB();
+  const item={id:fid.value,name:fname.value.trim(),cat:fcat.value,img:fimg.value.trim(),desc:fdesc.value.trim(),ad:fad.checked,until:funtil.value};
+  const i=data.findIndex(x=>x.id===item.id);
+  i>-1?data[i]=item:data.push(item);
+  localStorage.setItem(DB.DATA,JSON.stringify(data));
+  closeAll();render();
+}
+function handleDelete(){
+  if(!confirm("삭제할까요?"))return;
+  localStorage.setItem(DB.DATA,JSON.stringify(getDB().filter(x=>x.id!==fid.value)));
+  closeAll();render();
+}
+
+/* ===== 백업/복구 ===== */
+function exportData(){
+  const blob=new Blob([localStorage.getItem(DB.DATA)||"[]"],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+function importData(e){
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const json=JSON.parse(ev.target.result);
+      if(!Array.isArray(json)) throw 1;
+      if(confirm("기존 데이터를 덮어씁니다.")){
+        localStorage.setItem(DB.DATA,JSON.stringify(json));
+        render();alert("복구 완료");
+      }
+    }catch{alert("잘못된 백업 파일입니다.");}
+  };
+  r.readAsText(f);
+}
+</script>
+</body>
+</html>
