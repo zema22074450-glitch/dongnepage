@@ -336,13 +336,17 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 <main class="container">
 <section>
   <div class="page-hero">
-    <div class="page-title">면목동 맛집</div>
+    <!-- ✅ id 추가 -->
+    <div class="page-title" id="pageTitle">면목동 맛집</div>
     <div class="subtitle">
       면목동 주민이 직접 고른 동네 맛집 · 광고는 <b>“광고”</b>로 표시합니다<br>
       <span style="font-size:12px;">✅ 수시 업데이트 · ✅ 제보 환영(상단 ‘문의’)</span>
     </div>
 
     <div class="controls">
+      <!-- ✅ 뒤로 버튼(카테고리 화면으로) -->
+      <button class="pill" id="backBtn" type="button" style="display:none;">← 카테고리</button>
+
       <div class="search"><input id="searchInput" placeholder="국밥, 초밥, 술집…" /></div>
 
       <div class="sort">
@@ -540,25 +544,32 @@ const LS_NICK   = "nick";
 const LS_DARK   = "dark_v1";
 const LS_VIEWS  = "views_v1";
 
-/* ✅ 고정 데이터(1단계) */
-const DEFAULT_PLACES = [
-  {id:"d-a", name:"중랑구 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"https://i.imgur.com/3Qo3PQ4.jpg", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-b", name:"중랑구 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"https://i.imgur.com/e7LHDQT.jpeg", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-c", name:"중랑구 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"https://i.imgur.com/YohVLLZ.jpg", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-d", name:"중랑구 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"https://i.imgur.com/C5iuhPk.jpeg", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-e", name:"중랑구 카페", cat:"카페", desc:"커피맛집", img:"https://i.imgur.com/GCFu59r.jpg", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-f", name:"중랑구 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"https://i.imgur.com/8upBmbL.jpg", addr:"", sponsor:false, sponsorUntil:""},
-
-  // ✅ 여기! 마지막 쉼표 중요
-
+/* ✅ (핵심) 처음 화면: 고정 6개 = 카테고리 카드 */
+const CATEGORIES = [
+  {id:"cat-한식", name:"한식", cat:"한식", catKey:"한식", desc:"한식 맛집 모아보기", img:"https://i.imgur.com/3Qo3PQ4.jpg", addr:"", isCategory:true},
+  {id:"cat-일식", name:"일식", cat:"일식", catKey:"일식", desc:"초밥/회/라멘 모아보기", img:"https://i.imgur.com/e7LHDQT.jpeg", addr:"", isCategory:true},
+  {id:"cat-중식", name:"중식", cat:"중식", catKey:"중식", desc:"짜장/짬뽕/탕수육 모아보기", img:"https://i.imgur.com/YohVLLZ.jpg", addr:"", isCategory:true},
+  {id:"cat-고기", name:"고기", cat:"고기", catKey:"고기", desc:"삼겹/갈비 맛집 모아보기", img:"https://i.imgur.com/C5iuhPk.jpeg", addr:"", isCategory:true},
+  {id:"cat-카페", name:"카페", cat:"카페", catKey:"카페", desc:"커피/디저트 모아보기", img:"https://i.imgur.com/GCFu59r.jpg", addr:"", isCategory:true},
+  {id:"cat-술집", name:"술집", cat:"술집", catKey:"술집", desc:"안주 맛집 모아보기", img:"https://i.imgur.com/8upBmbL.jpg", addr:"", isCategory:true},
 ];
 
+/* ✅ 실제 식당 데이터(여기에 계속 추가하면 됨) */
+const DEFAULT_PLACES = [
+  /* 예시(원하면 삭제 가능)
+  {id:"p-1", name:"사가정 국밥", cat:"한식", desc:"진한 사골국밥", img:"", addr:"사가정로 00", sponsor:false, sponsorUntil:""},
+  {id:"p-2", name:"면목 스시", cat:"일식", desc:"가성비 초밥", img:"", addr:"면목로 00", sponsor:false, sponsorUntil:""},
+  */
+];
 
-/* 배너(1단계 고정) */
-let banner = {title:"배너 자리 (홍보 들어오면 여기!)", sub:"가게명 · 한 줄 소개 · 이벤트", link:"", isAd:true};
+/* ✅ 화면 모드: cats(카테고리6개) / list(식당목록) */
+let viewMode = "cats";     // 시작은 카테고리 화면
+let selectedCat = "all";
 
 let filter="all", q="";
 let sortMode="new";
+
+/* 실제 식당 목록 */
 let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || [...DEFAULT_PLACES];
 
 let savedIds = loadSavedIds();
@@ -568,6 +579,12 @@ let views = loadViews();
 const grid=document.getElementById("cardsGrid");
 const savedList=document.getElementById("savedList");
 const savedCount=document.getElementById("savedCount");
+
+/* 타이틀/뒤로 */
+const pageTitleEl = document.getElementById("pageTitle");
+const backBtn = document.getElementById("backBtn");
+const pillRowEl = document.querySelector(".pill-row");
+const sortWrapEl = document.querySelector(".sort");
 
 /* 토스트 */
 const toast = document.getElementById("toast");
@@ -628,6 +645,41 @@ function toggleDark(){
 }
 darkBtn.onclick = toggleDark;
 applyDarkFromStorage();
+
+/* ====== (핵심) 모드 전환 ====== */
+function setPillActive(name){
+  document.querySelectorAll(".pill").forEach(x=>{
+    const f = x.dataset && x.dataset.filter;
+    if(!f) return;
+    x.classList.toggle("active", f===name);
+  });
+}
+function updateModeUI(){
+  const isCats = (viewMode==="cats");
+  backBtn.style.display = isCats ? "none" : "inline-flex";
+  if(pillRowEl) pillRowEl.style.display = isCats ? "none" : "flex";
+  if(sortWrapEl) sortWrapEl.style.display = isCats ? "none" : "block";
+}
+
+function goCategories(){
+  viewMode = "cats";
+  selectedCat = "all";
+  filter = "all";
+  pageTitleEl.textContent = "면목동 맛집";
+  setPillActive("all");
+  updateModeUI();
+  render();
+}
+
+function openCategory(cat){
+  viewMode = "list";
+  selectedCat = cat;
+  filter = cat;
+  pageTitleEl.textContent = cat + " 맛집";
+  setPillActive(cat);
+  updateModeUI();
+  render();
+}
 
 /* ====== SVG 일러스트(사진 없을 때) ====== */
 const PALETTES = [
@@ -754,6 +806,9 @@ const bannerBadge = document.getElementById("bannerBadge");
 const bannerAdChip = document.getElementById("bannerAdChip");
 const bannerAskBtn = document.getElementById("bannerAskBtn");
 
+/* 배너(1단계 고정) */
+let banner = {title:"배너 자리 (홍보 들어오면 여기!)", sub:"가게명 · 한 줄 소개 · 이벤트", link:"", isAd:true};
+
 function renderBanner(){
   bannerTitleEl.textContent = banner.title;
   bannerSubEl.textContent = banner.sub;
@@ -811,11 +866,24 @@ detailCopyAddr.onclick = ()=>{
   navigator.clipboard?.writeText(addr).then(()=>showToast("주소 복사됨")).catch(()=>window.prompt("복사해서 쓰세요", addr));
 };
 
-/* ====== 렌더 ====== */
+/* ====== 렌더용 리스트 만들기 ====== */
 function buildList(){
+  /* 1) 카테고리 화면: 고정 6개 */
+  if(viewMode==="cats"){
+    let list = CATEGORIES.slice();
+    if(q){
+      list = list.filter(c=>{
+        const text = (c.name+" "+(c.desc||"")).toLowerCase();
+        return text.includes(q);
+      });
+    }
+    return list;
+  }
+
+  /* 2) 식당 목록 화면 */
   let list = places.filter(p=>{
     const text=(p.name+" "+(p.desc||"")+" "+(p.cat||"")+" "+(p.addr||"")).toLowerCase();
-    return (filter==="all"||p.cat===filter)&&(!q||text.includes(q));
+    return (filter==="all" || p.cat===filter) && (!q || text.includes(q));
   });
 
   if(sortMode==="popular"){
@@ -835,8 +903,10 @@ function render(){
   const list = buildList();
 
   list.forEach(p=>{
-    const isSaved=savedIds.includes(p.id);
-    const sponsorActive = isSponsorActive(p);
+    const isCategory = !!p.isCategory;
+    const isSaved = (!isCategory && savedIds.includes(p.id));
+    const sponsorActive = (!isCategory && isSponsorActive(p));
+
     const card=document.createElement("div");
     card.className="card" + (sponsorActive ? " has-ad" : "");
     card.id="card-"+p.id;
@@ -847,48 +917,75 @@ function render(){
     const img = (p.img||"").trim();
     const hasPhoto = shouldShowPhoto(p);
 
-    card.innerHTML=`
-      <div class="thumb">
-        ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
-        <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
-        <div class="img-overlay"></div>
+    /* ✅ 카테고리 카드 / 식당 카드 UI 분리 */
+    if(isCategory){
+      card.innerHTML=`
+        <div class="thumb">
+          ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
+          <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
+          <div class="img-overlay"></div>
+          <div class="badge">${esc(p.cat || p.name)}</div>
+        </div>
+        <div class="content">
+          <div class="name" style="padding-right:0;">${esc(p.name)}</div>
+          <div class="desc">${esc(p.desc||"")}</div>
+        </div>
+      `;
+    }else{
+      card.innerHTML=`
+        <div class="thumb">
+          ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
+          <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
+          <div class="img-overlay"></div>
 
-        <div class="badge">${esc(p.cat)}</div>
-        ${sponsorActive ? `<div class="badge ad">광고</div>` : ``}
-        <button class="heart ${isSaved?"active":""}" title="찜" type="button" aria-label="찜">❤</button>
-      </div>
-      <div class="content">
-        <div class="name">${esc(p.name)}</div>
-        <div class="desc">${esc(p.desc||"")}</div>
-        ${p.addr && p.addr.trim() ? `<div class="addr">📍 ${esc(p.addr)}</div>` : ``}
-        <div class="views-mini">조회수(내 기기) ${v}</div>
-        <button class="detail-btn" data-id="${p.id}" title="상세" type="button">상세</button>
-      </div>
-    `;
+          <div class="badge">${esc(p.cat)}</div>
+          ${sponsorActive ? `<div class="badge ad">광고</div>` : ``}
+          <button class="heart ${isSaved?"active":""}" title="찜" type="button" aria-label="찜">❤</button>
+        </div>
+        <div class="content">
+          <div class="name">${esc(p.name)}</div>
+          <div class="desc">${esc(p.desc||"")}</div>
+          ${p.addr && p.addr.trim() ? `<div class="addr">📍 ${esc(p.addr)}</div>` : ``}
+          <div class="views-mini">조회수(내 기기) ${v}</div>
+          <button class="detail-btn" data-id="${p.id}" title="상세" type="button">상세</button>
+        </div>
+      `;
 
-    card.querySelector(".heart").onclick=(e)=>{
-      e.stopPropagation();
-      if(isSaved){
-        savedIds=savedIds.filter(id=>id!==p.id);
-        showToast("찜 해제됨");
-      }else{
-        savedIds.push(p.id);
-        showToast("저장됨");
+      const heartEl = card.querySelector(".heart");
+      if(heartEl){
+        heartEl.onclick=(e)=>{
+          e.stopPropagation();
+          if(isSaved){
+            savedIds=savedIds.filter(id=>id!==p.id);
+            showToast("찜 해제됨");
+          }else{
+            savedIds.push(p.id);
+            showToast("저장됨");
+          }
+          saveSavedIds();
+          renderSaved();
+          render();
+        };
       }
-      saveSavedIds();
-      renderSaved();
-      render();
-    };
 
-    card.querySelector(".detail-btn").onclick=(e)=>{
-      e.stopPropagation();
-      openDetail(p);
-      render();
-    };
+      const detailBtn = card.querySelector(".detail-btn");
+      if(detailBtn){
+        detailBtn.onclick=(e)=>{
+          e.stopPropagation();
+          openDetail(p);
+          render();
+        };
+      }
+    }
 
+    /* ✅ 클릭 동작: 카테고리면 목록으로 / 식당이면 상세 */
     card.onclick=()=>{
-      openDetail(p);
-      render();
+      if(isCategory){
+        openCategory(p.catKey);
+      }else{
+        openDetail(p);
+        render();
+      }
     };
 
     grid.appendChild(card);
@@ -954,11 +1051,32 @@ function renderSaved(){
 const searchInput=document.getElementById("searchInput");
 searchInput.oninput=e=>{ q=(e.target.value||"").trim().toLowerCase(); render(); };
 
-document.querySelectorAll(".pill").forEach(p=>{
-  p.onclick=()=>{
-    document.querySelectorAll(".pill").forEach(x=>x.classList.remove("active"));
-    p.classList.add("active");
-    filter=p.dataset.filter;
+document.querySelectorAll(".pill").forEach(btn=>{
+  if(!btn.dataset || !btn.dataset.filter) return;
+  btn.onclick=()=>{
+    const f = btn.dataset.filter;
+    setPillActive(f);
+
+    /* 카테고리 화면에서는: pill을 누르면 바로 그 목록으로 들어가게 */
+    if(viewMode==="cats"){
+      if(f==="all"){
+        filter="all";
+        render();
+      }else{
+        openCategory(f);
+      }
+      return;
+    }
+
+    /* 식당 목록 화면에서는: 기존 필터처럼 동작 */
+    filter = f;
+    if(f==="all"){
+      pageTitleEl.textContent = "전체 맛집";
+      selectedCat = "all";
+    }else{
+      pageTitleEl.textContent = f + " 맛집";
+      selectedCat = f;
+    }
     render();
   };
 });
@@ -968,6 +1086,9 @@ sortSelect.onchange = (e)=>{
   sortMode = e.target.value;
   render();
 };
+
+/* 뒤로 버튼 */
+backBtn.onclick = goCategories;
 
 /* ====== 닉네임 ====== */
 const nickBtn=document.getElementById("nickBtn");
@@ -1086,11 +1207,13 @@ document.addEventListener("keydown",(e)=>{
 /* ====== 리렌더 ====== */
 function rerenderAll(){
   renderBanner();
+  updateModeUI();
   render();
   renderSaved();
 }
 
 /* ====== 초기 ====== */
+updateModeUI();
 render();
 renderSaved();
 </script>
