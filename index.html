@@ -345,7 +345,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 <section>
   <div class="page-hero">
     <!-- ✅ id 추가 -->
-    <div class="page-title" id="pageTitle">면목동 맛집</div>
+    <h1 class="page-title" id="pageTitle">면목동 맛집</h1>
     <div class="subtitle">
       면목동 주민이 직접 고른 동네 맛집 · 광고는 <b>“광고”</b>로 표시합니다<br>
       <span style="font-size:12px;">✅ 수시 업데이트 · ✅ 제보 환영(상단 ‘문의’)</span>
@@ -425,6 +425,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   <div class="left">
     <span class="pill">운영: 동네맛집</span>
     <span class="pill">문의: 오픈채팅</span>
+    <span>면목동 · 사가정 · 중랑구 맛집 정보 모음</span>
     <span>※ 닉네임/찜/조회수는 이 기기(브라우저)에만 저장됩니다.</span>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -1186,7 +1187,12 @@ const openKakaoBtn = document.getElementById("openKakaoBtn");
 const sideContactBtn = document.getElementById("sideContactBtn");
 
 function openContact(){ contactModal.classList.remove("hidden"); }
-contactBtn.onclick = openContact;
+contactBtn.onclick = ()=>{
+  if(typeof gtag === "function"){
+    gtag("event", "click_contact");
+  }
+  openContact();
+};
 sideContactBtn.onclick = openContact;
 closeContact.onclick = ()=> contactModal.classList.add("hidden");
 bindModalClose(contactModal, ()=>contactModal.classList.add("hidden"));
@@ -1225,6 +1231,8 @@ updateModeUI();
 render();
 renderSaved();
 </script>
+
+<noscript>면목동 주민이 직접 추천한 동네 맛집 모음 페이지입니다.</noscript>
 
 </body>
 </html>
