@@ -247,23 +247,27 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   .grid{grid-template-columns:1fr;}
   .banner-actions{flex-direction:column;align-items:stretch;}
 
-  /* ✅ 상단: 1줄(동네맛집) + 2줄(4버튼 한줄) */
+  /* ✅ 상단: 1줄(동네맛집+다크) + 2줄(닉네임/공유) + 3줄(문의) */
   .topbar-inner{
     display:grid;
-    grid-template-columns:1fr;
+    grid-template-columns:1fr 1fr;
+    grid-template-areas:
+      "brand dark"
+      "nick share"
+      "contact contact";
     gap:10px;
     align-items:center;
   }
 
-  .brand{justify-self:start;}
+  .top-actions{display:contents;}
+
+  .brand{grid-area:brand;justify-self:start;}
   .brand-text{font-size:20px;} /* 동네맛집 크게 */
 
-  .top-actions{
-    width:100%;
-    display:grid;
-    grid-template-columns:repeat(4, minmax(0,1fr));
-    gap:6px; /* 버튼 간격 조금만 */
-  }
+  .dark-btn{grid-area:dark;justify-self:end;}
+  .nick-btn{grid-area:nick;}
+  .share-btn{grid-area:share;}
+  .contact-btn{grid-area:contact;}
 
   /* 버튼 크기(조금 작게, 터치영역은 유지) */
   .nick-btn,.contact-btn,.share-btn,.dark-btn{
@@ -284,16 +288,20 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
     color:#2563eb;
   }
 
-  /* 모바일 라벨: 문의/닉은 짧은 텍스트, 공유/다크는 아이콘만 */
-  .btn-label-long{display:none;}
-  .btn-label-short{display:inline;}
+  /* 모바일 라벨: 기본 텍스트, 다크는 아이콘만, 문의는 텍스트 */
+  .btn-label-long{display:inline;}
+  .btn-label-short{display:none;}
 
-  /* 공유/다크는 아이콘만 보이게 */
-  .share-btn .btn-label-short,
+  .dark-btn{width:auto;}
+  .dark-btn .btn-label-long{display:none;}
   .dark-btn .btn-label-short{
-    font-size:16px;
+    display:inline;
+    font-size:18px;
     line-height:1;
   }
+
+  .contact-btn .btn-label-long{display:none;}
+  .contact-btn .btn-label-short{display:inline;}
 
   /* ✅ 모바일: 카드 조회수 숨김 + 상세 버튼 숨김(B) */
   .views-mini{display:none;}
@@ -322,7 +330,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
       <!-- 문의(텍스트) -->
       <button class="contact-btn" id="contactBtn" title="가게 제보/홍보 문의" type="button">
         <span class="btn-label-long">문의</span>
-        <span class="btn-label-short">💬 문의</span>
+        <span class="btn-label-short">문의하기</span>
       </button>
 
       <!-- 닉네임(텍스트) -->
