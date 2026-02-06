@@ -32,7 +32,7 @@ body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));c
 .topbar-inner{max-width:1200px;margin:0 auto;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
 
 /* ✅ 브랜드(심플) */
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap;}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap;text-decoration:none;color:inherit;}
 .logo{width:22px;height:22px;display:grid;place-items:center;}
 .logo svg{width:22px;height:22px;display:block}
 .brand-text{font-weight:950;letter-spacing:-.2px;font-size:16px;}
@@ -293,7 +293,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand">
+    <a class="brand" href="/" aria-label="동네맛집 홈">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M12 21s7-4.6 7-11a7 7 0 0 0-14 0c0 6.4 7 11 7 11z"
@@ -303,7 +303,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
         </svg>
       </div>
       <div class="brand-text">동네맛집</div>
-    </div>
+    </a>
 
     <div class="top-actions">
       <!-- 문의(텍스트) -->
@@ -414,6 +414,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
     <span class="pill">운영: 동네맛집</span>
     <span class="pill">문의: 오픈채팅</span>
     <span>※ 닉네임/찜/조회수는 이 기기(브라우저)에만 저장됩니다.</span>
+    <span>※ 개인적인 방문 경험을 바탕으로 작성되었습니다.</span>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
     <button id="footerPolicyBtn" type="button">개인정보 안내</button>
@@ -542,12 +543,12 @@ const LS_VIEWS  = "views_v1";
 
 /* ✅ 고정 데이터(1단계) */
 const DEFAULT_PLACES = [
-  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", img:"", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"", addr:"", sponsor:false, sponsorUntil:""}
+  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"https://images.unsplash.com/photo-1543353071-087092ec393a?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"https://images.unsplash.com/photo-1553621042-f6e147245754?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"https://images.unsplash.com/photo-1514361892635-6b07e31e75f9?auto=format&fit=crop&w=1000&q=80", addr:"", sponsor:false, sponsorUntil:""}
 ];
 
 /* 배너(1단계 고정) */
@@ -780,6 +781,25 @@ const detailCopyAddr = document.getElementById("detailCopyAddr");
 const closeDetail = document.getElementById("closeDetail");
 let currentDetailPlace = null;
 
+function buildPlaceUrl(id){
+  const url = new URL(window.location.href);
+  url.searchParams.set("place", id);
+  const params = url.searchParams.toString();
+  return url.pathname + (params ? `?${params}` : "");
+}
+
+function navigateToPlace(id){
+  window.location.href = buildPlaceUrl(id);
+}
+
+function clearPlaceParam(){
+  const url = new URL(window.location.href);
+  if(!url.searchParams.has("place")) return;
+  url.searchParams.delete("place");
+  const params = url.searchParams.toString();
+  history.replaceState({}, "", url.pathname + (params ? `?${params}` : "") + url.hash);
+}
+
 function openDetail(place){
   currentDetailPlace = place;
   incView(place.id);
@@ -792,7 +812,11 @@ function openDetail(place){
   detailAddr.textContent = (place.addr && place.addr.trim()) ? ("주소: " + place.addr) : "주소: (없음)";
   detailModal.classList.remove("hidden");
 }
-closeDetail.onclick = ()=> detailModal.classList.add("hidden");
+function closeDetailModal(){
+  detailModal.classList.add("hidden");
+  clearPlaceParam();
+}
+closeDetail.onclick = closeDetailModal;
 detailOpenMap.onclick = ()=>{
   if(!currentDetailPlace) return;
   const p = currentDetailPlace;
@@ -858,7 +882,7 @@ function render(){
         <div class="desc">${esc(p.desc||"")}</div>
         ${p.addr && p.addr.trim() ? `<div class="addr">📍 ${esc(p.addr)}</div>` : ``}
         <div class="views-mini">조회수(내 기기) ${v}</div>
-        <button class="detail-btn" data-id="${p.id}" title="상세" type="button">상세</button>
+        <a class="detail-btn" href="${esc(buildPlaceUrl(p.id))}" title="상세">상세</a>
       </div>
     `;
 
@@ -876,15 +900,8 @@ function render(){
       render();
     };
 
-    card.querySelector(".detail-btn").onclick=(e)=>{
-      e.stopPropagation();
-      openDetail(p);
-      render();
-    };
-
     card.onclick=()=>{
-      openDetail(p);
-      render();
+      navigateToPlace(p.id);
     };
 
     grid.appendChild(card);
@@ -1010,7 +1027,7 @@ closeAbout.onclick=()=>aboutModal.classList.add("hidden");
 
 bindModalClose(nickModal, ()=>nickModal.classList.add("hidden"));
 bindModalClose(aboutModal, ()=>aboutModal.classList.add("hidden"));
-bindModalClose(detailModal, ()=>detailModal.classList.add("hidden"));
+bindModalClose(detailModal, closeDetailModal);
 
 /* 개인정보/광고 모달 */
 const policyModal = document.getElementById("policyModal");
@@ -1074,9 +1091,12 @@ clearSavedBtn.onclick = ()=>{
 /* ✅ ESC 닫기 */
 document.addEventListener("keydown",(e)=>{
   if(e.key!=="Escape") return;
-  [nickModal, aboutModal, shareModal, contactModal, detailModal, policyModal, adModal]
+  [nickModal, aboutModal, shareModal, contactModal, policyModal, adModal]
     .filter(Boolean)
     .forEach(m=>m.classList.add("hidden"));
+  if(detailModal && !detailModal.classList.contains("hidden")){
+    closeDetailModal();
+  }
 });
 
 /* ====== 리렌더 ====== */
@@ -1086,9 +1106,20 @@ function rerenderAll(){
   renderSaved();
 }
 
+function openDetailFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("place");
+  if(!id) return;
+  const match = places.find(p=>p.id===id);
+  if(match){
+    openDetail(match);
+  }
+}
+
 /* ====== 초기 ====== */
 render();
 renderSaved();
+openDetailFromUrl();
 </script>
 
 </body>
