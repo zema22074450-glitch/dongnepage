@@ -40,7 +40,7 @@ body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));c
 .topbar-inner{max-width:1200px;margin:0 auto;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
 
 /* ✅ 브랜드(심플) */
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap;}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;white-space:nowrap;text-decoration:none;color:inherit;}
 .logo{width:22px;height:22px;display:grid;place-items:center;}
 .logo svg{width:22px;height:22px;display:block}
 .brand-text{font-weight:950;letter-spacing:-.2px;font-size:16px;}
@@ -81,6 +81,7 @@ body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));c
 .search input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);font-weight:700;background:var(--card);color:var(--text);}
 .pill-row{display:flex;gap:8px;flex-wrap:wrap;}
 .pill{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-weight:800;cursor:pointer;color:var(--text);}
+.pill{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;}
 .pill.active{background:#2563eb;color:#fff;border-color:#2563eb;}
 .sort select{
   padding:12px 14px;border-radius:14px;border:1px solid var(--border);
@@ -128,6 +129,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
 .grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
 .card{border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:0 14px 35px rgba(15,23,42,.1);overflow:hidden;cursor:pointer;position:relative;}
+.card-link{display:block;text-decoration:none;color:inherit;}
 .thumb{height:180px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(15,23,42,.04),rgba(15,23,42,.02));}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;z-index:1;}
 .thumb .img-overlay{
@@ -159,6 +161,25 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   background:var(--card);font-weight:900;font-size:12px;cursor:pointer;color:var(--text);
 }
 .detail-btn:hover{border-color:#cbd5e1}
+
+.detail-view{
+  margin-top:16px;
+  border-radius:22px;
+  background:var(--card);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:18px;
+  display:none;
+}
+.detail-view.show{display:block;}
+.detail-meta{font-size:13px;color:var(--muted);font-weight:800;margin-top:6px;}
+.detail-desc{margin-top:8px;font-weight:700;color:var(--text);}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.detail-actions a,.detail-actions button{
+  padding:10px 12px;border-radius:14px;border:1px solid var(--border);
+  background:var(--card);font-weight:900;cursor:pointer;color:var(--text);text-decoration:none;
+}
+.detail-actions a:hover,.detail-actions button:hover{border-color:#cbd5e1}
 
 /* 사이드 */
 .side-card{border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 30px rgba(15,23,42,.08);overflow:hidden;}
@@ -314,7 +335,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand">
+    <a class="brand" href="/">
       <div class="logo" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M12 21s7-4.6 7-11a7 7 0 0 0-14 0c0 6.4 7 11 7 11z"
@@ -324,7 +345,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
         </svg>
       </div>
       <div class="brand-text">동네맛집</div>
-    </div>
+    </a>
 
     <div class="top-actions">
       <!-- 문의(텍스트) -->
@@ -366,7 +387,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
     <div class="controls">
       <!-- ✅ 뒤로 버튼(카테고리 화면으로) -->
-      <button class="pill" id="backBtn" type="button" style="display:none;">← 카테고리</button>
+      <a class="pill" id="backBtn" href="/" style="display:none;">← 카테고리</a>
 
       <div class="search"><input id="searchInput" placeholder="국밥, 초밥, 술집…" /></div>
 
@@ -379,7 +400,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
       <div class="pill-row">
         <button class="pill active" data-filter="all" type="button">전체</button>
-        <button class="pill" data-filter="한식" type="button">한식</button>
+        <button class="pill" data-filter="국밥" type="button">국밥</button>
         <button class="pill" data-filter="일식" type="button">일식</button>
         <button class="pill" data-filter="중식" type="button">중식</button>
         <button class="pill" data-filter="고기" type="button">고기</button>
@@ -410,6 +431,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
     </div>
   </div>
 
+  <div id="detailView" class="detail-view" aria-live="polite"></div>
   <div id="cardsGrid" class="grid"></div>
 </section>
 
@@ -441,6 +463,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
     <span class="pill">문의: 오픈채팅</span>
     <span>면목동 · 사가정 · 중랑구 맛집 정보 모음</span>
     <span>※ 닉네임/찜/조회수는 이 기기(브라우저)에만 저장됩니다.</span>
+    <span>※ 개인적인 방문 경험을 바탕으로 작성되었습니다.</span>
   </div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
     <button id="footerPolicyBtn" type="button">개인정보 안내</button>
@@ -509,23 +532,6 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   </div>
 </div>
 
-<!-- 맛집 상세 -->
-<div id="detailModal" class="modal hidden">
-  <div class="modal-box">
-    <h3 id="detailTitle">맛집 상세</h3>
-    <div class="form-note" id="detailMeta" style="margin-bottom:10px;"></div>
-    <div class="form-note" id="detailDesc" style="margin-bottom:10px;"></div>
-    <div class="form-note" id="detailAddr" style="margin-bottom:10px;"></div>
-    <div class="modal-row">
-      <button id="detailOpenMap" type="button">네이버지도 열기</button>
-      <button class="btn-ghost" id="detailCopyAddr" type="button">주소 복사</button>
-    </div>
-    <div class="modal-row">
-      <button class="btn-ghost" id="closeDetail" type="button">닫기</button>
-    </div>
-  </div>
-</div>
-
 <!-- 개인정보 안내 -->
 <div id="policyModal" class="modal hidden">
   <div class="modal-box">
@@ -569,12 +575,12 @@ const LS_VIEWS  = "views_v1";
 
 /* ✅ (핵심) 처음 화면: 고정 6개 = 카테고리 카드 */
 const CATEGORIES = [
-  {id:"cat-한식", name:"한식", cat:"한식", catKey:"한식", desc:"한식 맛집 모아보기", img:"https://i.imgur.com/3Qo3PQ4.jpg", addr:"", isCategory:true},
-  {id:"cat-일식", name:"일식", cat:"일식", catKey:"일식", desc:"초밥/회/라멘 모아보기", img:"https://i.imgur.com/e7LHDQT.jpeg", addr:"", isCategory:true},
-  {id:"cat-중식", name:"중식", cat:"중식", catKey:"중식", desc:"짜장/짬뽕/탕수육 모아보기", img:"https://i.imgur.com/YohVLLZ.jpg", addr:"", isCategory:true},
-  {id:"cat-고기", name:"고기", cat:"고기", catKey:"고기", desc:"삼겹/갈비 맛집 모아보기", img:"https://i.imgur.com/C5iuhPk.jpeg", addr:"", isCategory:true},
-  {id:"cat-카페", name:"카페", cat:"카페", catKey:"카페", desc:"커피/디저트 모아보기", img:"https://i.imgur.com/GCFu59r.jpg", addr:"", isCategory:true},
-  {id:"cat-술집", name:"술집", cat:"술집", catKey:"술집", desc:"안주 맛집 모아보기", img:"https://i.imgur.com/8upBmbL.jpg", addr:"", isCategory:true},
+  {id:"cat-국밥", name:"국밥", cat:"국밥", catKey:"국밥", desc:"국밥 맛집 모아보기", img:"https://images.unsplash.com/photo-1604908554027-55d2333c814b?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
+  {id:"cat-일식", name:"일식", cat:"일식", catKey:"일식", desc:"초밥/회/라멘 모아보기", img:"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
+  {id:"cat-중식", name:"중식", cat:"중식", catKey:"중식", desc:"짜장/짬뽕/탕수육 모아보기", img:"https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
+  {id:"cat-고기", name:"고기", cat:"고기", catKey:"고기", desc:"삼겹/갈비 맛집 모아보기", img:"https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
+  {id:"cat-카페", name:"카페", cat:"카페", catKey:"카페", desc:"커피/디저트 모아보기", img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
+  {id:"cat-술집", name:"술집", cat:"술집", catKey:"술집", desc:"안주 맛집 모아보기", img:"https://images.unsplash.com/photo-1514361892635-6c8b1b8c2d0f?auto=format&fit=crop&w=1200&q=80", addr:"", isCategory:true},
 ];
 
 /* ✅ 실제 식당 데이터(여기에 계속 추가하면 됨) */
@@ -682,25 +688,57 @@ function updateModeUI(){
   backBtn.style.display = isCats ? "none" : "inline-flex";
   if(pillRowEl) pillRowEl.style.display = isCats ? "none" : "flex";
   if(sortWrapEl) sortWrapEl.style.display = isCats ? "none" : "block";
+  if(!isCats){
+    backBtn.setAttribute("href", buildCategoryUrl(selectedCat || "all"));
+  }
 }
 
-function goCategories(){
-  viewMode = "cats";
-  selectedCat = "all";
-  filter = "all";
-  pageTitleEl.textContent = "면목동 맛집";
-  setPillActive("all");
-  updateModeUI();
-  render();
+function buildCategoryUrl(cat){
+  if(!cat || cat === "all") return location.pathname;
+  return location.pathname + "?cat=" + encodeURIComponent(cat);
+}
+function buildPlaceUrl(place){
+  const params = new URLSearchParams();
+  if(place?.cat) params.set("cat", place.cat);
+  params.set("place", place.id);
+  return location.pathname + "?" + params.toString();
 }
 
-function openCategory(cat){
-  viewMode = "list";
-  selectedCat = cat;
-  filter = cat;
-  pageTitleEl.textContent = cat + " 맛집";
-  setPillActive(cat);
+function applyRoute(){
+  const params = new URLSearchParams(location.search);
+  const catParam = params.get("cat");
+  const placeParam = params.get("place");
+
+  activePlaceId = placeParam || null;
+  if(activePlaceId && activePlaceId !== lastViewedPlaceId){
+    incView(activePlaceId);
+    lastViewedPlaceId = activePlaceId;
+  }
+
+  if(catParam){
+    viewMode = "list";
+    selectedCat = catParam;
+    filter = catParam;
+    pageTitleEl.textContent = catParam + " 맛집";
+    setPillActive(catParam);
+  }else if(placeParam){
+    const place = places.find(p=>p.id===placeParam);
+    const cat = place?.cat || "all";
+    viewMode = "list";
+    selectedCat = cat;
+    filter = cat;
+    pageTitleEl.textContent = cat === "all" ? "전체 맛집" : (cat + " 맛집");
+    setPillActive(cat);
+  }else{
+    viewMode = "cats";
+    selectedCat = "all";
+    filter = "all";
+    pageTitleEl.textContent = "면목동 맛집";
+    setPillActive("all");
+  }
+
   updateModeUI();
+  renderDetail();
   render();
 }
 
@@ -851,43 +889,58 @@ function isSponsorActive(p){
   return end.getTime() >= today.getTime();
 }
 
-/* ====== 상세 모달 ====== */
-const detailModal = document.getElementById("detailModal");
-const detailTitle = document.getElementById("detailTitle");
-const detailMeta  = document.getElementById("detailMeta");
-const detailDesc  = document.getElementById("detailDesc");
-const detailAddr  = document.getElementById("detailAddr");
-const detailOpenMap = document.getElementById("detailOpenMap");
-const detailCopyAddr = document.getElementById("detailCopyAddr");
-const closeDetail = document.getElementById("closeDetail");
-let currentDetailPlace = null;
+/* ====== 상세 뷰 ====== */
+const detailViewEl = document.getElementById("detailView");
+let activePlaceId = null;
+let lastViewedPlaceId = null;
 
-function openDetail(place){
-  currentDetailPlace = place;
-  incView(place.id);
+function buildMapUrl(place){
+  const query=(place.addr && place.addr.trim()) ? (place.name+" "+place.addr) : place.name;
+  return "https://map.naver.com/v5/search/" + encodeURIComponent(query);
+}
 
-  detailTitle.textContent = place.name || "맛집 상세";
+function renderDetail(){
+  if(!activePlaceId){
+    detailViewEl.classList.remove("show");
+    detailViewEl.innerHTML = "";
+    return;
+  }
+
+  const place = places.find(p=>p.id===activePlaceId);
+  if(!place){
+    detailViewEl.classList.remove("show");
+    detailViewEl.innerHTML = "";
+    return;
+  }
+
   const v = views[place.id] || 0;
   const sponsorText = isSponsorActive(place) ? " · 광고" : "";
-  detailMeta.innerHTML = `카테고리: <b>${esc(place.cat||"")}</b>${sponsorText}<br>조회수(내 기기): <b>${v}</b>`;
-  detailDesc.textContent = place.desc ? ("소개: " + place.desc) : "소개: (없음)";
-  detailAddr.textContent = (place.addr && place.addr.trim()) ? ("주소: " + place.addr) : "주소: (없음)";
-  detailModal.classList.remove("hidden");
+  const meta = `카테고리: <b>${esc(place.cat||"")}</b>${sponsorText} · 조회수(내 기기): <b>${v}</b>`;
+  const desc = place.desc ? ("소개: " + esc(place.desc)) : "소개: (없음)";
+  const addr = (place.addr && place.addr.trim()) ? ("주소: " + esc(place.addr)) : "주소: (없음)";
+  const mapUrl = buildMapUrl(place);
+
+  detailViewEl.innerHTML = `
+    <div class="page-title" style="font-size:20px;-webkit-text-fill-color:unset;background:none;">${esc(place.name || "맛집 상세")}</div>
+    <div class="detail-meta">${meta}</div>
+    <div class="detail-desc">${desc}</div>
+    <div class="detail-meta" style="margin-top:8px;">${addr}</div>
+    <div class="detail-actions">
+      <a href="${mapUrl}" target="_blank" rel="noopener noreferrer">네이버지도 열기</a>
+      <button id="detailCopyAddr" type="button">주소 복사</button>
+    </div>
+  `;
+  detailViewEl.classList.add("show");
+
+  const copyBtn = document.getElementById("detailCopyAddr");
+  if(copyBtn){
+    copyBtn.onclick = ()=>{
+      const addrValue = (place.addr||"").trim();
+      if(!addrValue) return showToast("주소가 없어요");
+      navigator.clipboard?.writeText(addrValue).then(()=>showToast("주소 복사됨")).catch(()=>window.prompt("복사해서 쓰세요", addrValue));
+    };
+  }
 }
-closeDetail.onclick = ()=> detailModal.classList.add("hidden");
-detailOpenMap.onclick = ()=>{
-  if(!currentDetailPlace) return;
-  const p = currentDetailPlace;
-  const query=(p.addr&&p.addr.trim()) ? (p.name+" "+p.addr) : p.name;
-  const url="https://map.naver.com/v5/search/"+encodeURIComponent(query);
-  window.open(url,"_blank","noopener,noreferrer");
-};
-detailCopyAddr.onclick = ()=>{
-  if(!currentDetailPlace) return;
-  const addr = (currentDetailPlace.addr||"").trim();
-  if(!addr) return showToast("주소가 없어요");
-  navigator.clipboard?.writeText(addr).then(()=>showToast("주소 복사됨")).catch(()=>window.prompt("복사해서 쓰세요", addr));
-};
 
 /* ====== 렌더용 리스트 만들기 ====== */
 function buildList(){
@@ -930,8 +983,8 @@ function render(){
     const isSaved = (!isCategory && savedIds.includes(p.id));
     const sponsorActive = (!isCategory && isSponsorActive(p));
 
-    const card=document.createElement("div");
-    card.className="card" + (sponsorActive ? " has-ad" : "");
+    const card=document.createElement("a");
+    card.className="card card-link" + (sponsorActive ? " has-ad" : "");
     card.id="card-"+p.id;
 
     const svg = cardIllustrationSVG(p);
@@ -942,6 +995,7 @@ function render(){
 
     /* ✅ 카테고리 카드 / 식당 카드 UI 분리 */
     if(isCategory){
+      card.href = buildCategoryUrl(p.catKey);
       card.innerHTML=`
         <div class="thumb">
           ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
@@ -955,6 +1009,7 @@ function render(){
         </div>
       `;
     }else{
+      card.href = buildPlaceUrl(p);
       card.innerHTML=`
         <div class="thumb">
           ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
@@ -970,13 +1025,13 @@ function render(){
           <div class="desc">${esc(p.desc||"")}</div>
           ${p.addr && p.addr.trim() ? `<div class="addr">📍 ${esc(p.addr)}</div>` : ``}
           <div class="views-mini">조회수(내 기기) ${v}</div>
-          <button class="detail-btn" data-id="${p.id}" title="상세" type="button">상세</button>
         </div>
       `;
 
       const heartEl = card.querySelector(".heart");
       if(heartEl){
         heartEl.onclick=(e)=>{
+          e.preventDefault();
           e.stopPropagation();
           if(isSaved){
             savedIds=savedIds.filter(id=>id!==p.id);
@@ -990,26 +1045,7 @@ function render(){
           render();
         };
       }
-
-      const detailBtn = card.querySelector(".detail-btn");
-      if(detailBtn){
-        detailBtn.onclick=(e)=>{
-          e.stopPropagation();
-          openDetail(p);
-          render();
-        };
-      }
     }
-
-    /* ✅ 클릭 동작: 카테고리면 목록으로 / 식당이면 상세 */
-    card.onclick=()=>{
-      if(isCategory){
-        openCategory(p.catKey);
-      }else{
-        openDetail(p);
-        render();
-      }
-    };
 
     grid.appendChild(card);
   });
@@ -1032,7 +1068,7 @@ function renderSaved(){
     return;
   }
   savedList.innerHTML=savedPlaces.map(p=>`
-    <div class="saved-item" data-id="${p.id}">
+    <a class="saved-item" href="${buildPlaceUrl(p)}" data-id="${p.id}">
       <div class="left">
         <div class="t">${esc(p.name)}</div>
         <div class="s">${esc(p.cat)} · ${esc(p.desc||"")}</div>
@@ -1041,24 +1077,12 @@ function renderSaved(){
         <div class="go">열기</div>
         <button class="x" data-x="${p.id}" title="찜 해제" type="button">✕</button>
       </div>
-    </div>
+    </a>
   `).join("");
-
-  savedList.querySelectorAll(".saved-item").forEach(el=>{
-    el.onclick=(e)=>{
-      if(e.target && e.target.dataset && e.target.dataset.x) return;
-      const id=el.dataset.id;
-      const p = places.find(x=>x.id===id);
-      if(p){
-        openDetail(p);
-        render();
-        showToast("상세 열림");
-      }
-    };
-  });
 
   savedList.querySelectorAll("button.x").forEach(btn=>{
     btn.onclick=(e)=>{
+      e.preventDefault();
       e.stopPropagation();
       const id = btn.dataset.x;
       savedIds = savedIds.filter(x=>x!==id);
@@ -1083,10 +1107,9 @@ document.querySelectorAll(".pill").forEach(btn=>{
     /* 카테고리 화면에서는: pill을 누르면 바로 그 목록으로 들어가게 */
     if(viewMode==="cats"){
       if(f==="all"){
-        filter="all";
-        render();
+        location.href = buildCategoryUrl("all");
       }else{
-        openCategory(f);
+        location.href = buildCategoryUrl(f);
       }
       return;
     }
@@ -1110,8 +1133,7 @@ sortSelect.onchange = (e)=>{
   render();
 };
 
-/* 뒤로 버튼 */
-backBtn.onclick = goCategories;
+/* 뒤로 버튼은 링크로 동작 */
 
 /* ====== 닉네임 ====== */
 const nickBtn=document.getElementById("nickBtn");
@@ -1158,7 +1180,6 @@ closeAbout.onclick=()=>aboutModal.classList.add("hidden");
 
 bindModalClose(nickModal, ()=>nickModal.classList.add("hidden"));
 bindModalClose(aboutModal, ()=>aboutModal.classList.add("hidden"));
-bindModalClose(detailModal, ()=>detailModal.classList.add("hidden"));
 
 /* 개인정보/광고 모달 */
 const policyModal = document.getElementById("policyModal");
@@ -1227,7 +1248,7 @@ clearSavedBtn.onclick = ()=>{
 /* ✅ ESC 닫기 */
 document.addEventListener("keydown",(e)=>{
   if(e.key!=="Escape") return;
-  [nickModal, aboutModal, shareModal, contactModal, detailModal, policyModal, adModal]
+  [nickModal, aboutModal, shareModal, contactModal, policyModal, adModal]
     .filter(Boolean)
     .forEach(m=>m.classList.add("hidden"));
 });
@@ -1236,14 +1257,15 @@ document.addEventListener("keydown",(e)=>{
 function rerenderAll(){
   renderBanner();
   updateModeUI();
+  renderDetail();
   render();
   renderSaved();
 }
 
 /* ====== 초기 ====== */
-updateModeUI();
-render();
+applyRoute();
 renderSaved();
+window.addEventListener("popstate", applyRoute);
 </script>
 
 <noscript>면목동 주민이 직접 추천한 동네 맛집 모음 페이지입니다.</noscript>
