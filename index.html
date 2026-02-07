@@ -80,14 +80,19 @@ body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));c
 .search{flex:1;min-width:220px;}
 .search input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);font-weight:700;background:var(--card);color:var(--text);}
 .search-link{
-  display:inline-flex;
+  display:flex;
   align-items:center;
+  justify-content:center;
   gap:6px;
-  margin-top:6px;
+  margin-top:4px;
   font-size:12px;
   font-weight:800;
   color:#2563eb;
   text-decoration:none;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.2;
 }
 .search-link:hover{ text-decoration:underline; }
 .search-link:focus-visible{outline:2px solid rgba(37,99,235,.35); outline-offset:2px; border-radius:8px;}
@@ -339,6 +344,11 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   /* ✅ 모바일: 카드 조회수 숨김 + 상세 버튼 숨김(B) */
   .views-mini{display:none;}
   .detail-btn{display:none;}
+
+  .search-link{
+    font-size:11px;
+    margin-top:2px;
+  }
 }
 </style>
 </head>
