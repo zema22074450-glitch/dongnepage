@@ -79,6 +79,18 @@ body{min-height:100vh;background:linear-gradient(140deg,var(--bg1),var(--bg2));c
 .controls{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .search{flex:1;min-width:220px;}
 .search input{width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);font-weight:700;background:var(--card);color:var(--text);}
+.search-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  font-size:12px;
+  font-weight:800;
+  color:#2563eb;
+  text-decoration:none;
+}
+.search-link:hover{ text-decoration:underline; }
+.search-link:focus-visible{outline:2px solid rgba(37,99,235,.35); outline-offset:2px; border-radius:8px;}
 .pill-row{display:flex;gap:8px;flex-wrap:wrap;}
 .pill{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-weight:800;cursor:pointer;color:var(--text);}
 .pill{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;}
@@ -389,7 +401,12 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
       <!-- ✅ 뒤로 버튼(카테고리 화면으로) -->
       <a class="pill" id="backBtn" href="/" style="display:none;">← 카테고리</a>
 
-      <div class="search"><input id="searchInput" placeholder="국밥, 초밥, 술집…" /></div>
+      <div class="search">
+        <input id="searchInput" placeholder="국밥, 초밥, 술집…" />
+        <a class="search-link" href="https://blog.naver.com/dongnepage" target="_blank" rel="noopener noreferrer">
+          동네페이지 블로그 바로가기
+        </a>
+      </div>
 
       <div class="sort">
         <select id="sortSelect" title="정렬">
