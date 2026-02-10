@@ -2,12 +2,21 @@
   const KEY = "CATEGORY_LIST";
   const DEFAULT_CATEGORIES = ["국밥", "일식", "중식", "고기", "카페", "Bar / Pocha (술집)"];
   const LEGACY_CATEGORY_MAP = {
-    "술집": "Bar / Pocha (술집)"
+    "술집": "Bar / Pocha (술집)",
+    "술집·포차": "Bar / Pocha (술집)"
+  };
+  const CATEGORY_LABEL_MAP = {
+    "Bar / Pocha (술집)": "술집·포차"
   };
 
   function normalizeCategory(value){
     const raw = String(value || "").trim();
     return LEGACY_CATEGORY_MAP[raw] || raw;
+  }
+
+  function displayCategory(value){
+    const normalized = normalizeCategory(value);
+    return CATEGORY_LABEL_MAP[normalized] || normalized;
   }
 
   function normalizeCategoryList(list){
@@ -47,7 +56,7 @@
       "중식": "짜장/짬뽕/탕수육 모아보기",
       "고기": "삼겹/갈비 맛집 모아보기",
       "카페": "커피/디저트 모아보기",
-      "Bar / Pocha (술집)": "Bar / Pocha (술집) 모아보기"
+      "Bar / Pocha (술집)": "술집·포차 모아보기"
     };
     return map[cat] || `${cat} 맛집 모아보기`;
   }
@@ -65,6 +74,7 @@
     KEY,
     DEFAULT_CATEGORIES,
     normalizeCategory,
+    displayCategory,
     loadCategories,
     saveCategories,
     categoryDescription,

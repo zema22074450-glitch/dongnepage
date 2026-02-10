@@ -29,6 +29,8 @@ button:hover{opacity:.85}
 .panel{position:fixed;right:0;top:0;width:100%;max-width:420px;height:100%;background:#fff;z-index:20;padding:24px;overflow:auto;box-shadow:-4px 0 15px rgba(0,0,0,.1)}
 .panel input,.panel select,.panel textarea{margin-bottom:14px;width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px}
 .preview-box{width:100%;height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:10px;object-fit:cover;border:1px solid var(--border)}
+.preview-list{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.preview-list img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#f1f5f9}
 .status-msg{font-size:12px;font-weight:700;color:#475569;margin:-8px 0 12px}
 .status-msg.ok{color:#059669}
 .status-msg.err{color:#dc2626}
@@ -82,6 +84,7 @@ button:hover{opacity:.85}
 <div id="editPanel" class="panel hidden">
   <h3 id="panelHeader"></h3>
   <img id="imgPrev" class="preview-box" alt="이미지 미리보기">
+  <div id="imgList" class="preview-list"></div>
   <div id="imgStatus" class="status-msg">이미지를 선택하면 여기에서 미리보기를 확인할 수 있습니다.</div>
   <input id="fid" readonly>
   <input id="fname" placeholder="가게명 *">
@@ -94,8 +97,9 @@ button:hover{opacity:.85}
     <button class="btn-main" type="button" onclick="addCategory()">추가</button>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*" onchange="handleImgUpload(event)">
-  <input id="fimg" placeholder="이미지 URL 또는 업로드 결과" oninput="updatePreview()">
+  <input type="file" id="fileInput" accept="image/*" multiple onchange="handleImgUpload(event)">
+  <textarea id="fimgs" rows="3" placeholder="이미지 URL 여러 개 (줄바꿈으로 구분, 최대 4장)" oninput="updatePreview()"></textarea>
+  <input id="fimg" placeholder="대표 이미지 URL (첫 이미지로 자동 설정)" readonly>
 
   <textarea id="fdesc" rows="3" placeholder="소개"></textarea>
 
@@ -117,6 +121,7 @@ const ADMIN_ID="admin", ADMIN_PW="1234";
 const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"PLACES_DATA",CAT:"CATEGORY_LIST"};
 const DEFAULT_CATS=CategoryStore.DEFAULT_CATEGORIES;
 const LOGIN_LIMIT=1000*60*60*24;
+const MAX_IMAGE_COUNT=4;
 
 let toastTimer=null;
 function showToast(msg){
@@ -157,7 +162,28 @@ function normalizeCat(value){
 }
 
 function categoryLabel(cat){
-  return CategoryStore.normalizeCategory(cat);
+  return CategoryStore.displayCategory(cat);
+}
+
+function parseImageList(value){
+  if(!value) return [];
+  return Array.from(new Set(
+    String(value)
+       .split(/\n/)
+      .map(v=>v.trim())
+      .filter(Boolean)
+  )).slice(0,MAX_IMAGE_COUNT);
+}
+
+function encodeImageList(list){
+  return list.join("\n");
+}
+
+function getItemImages(item){
+  const imgsFromArray = Array.isArray(item?.imgs) ? item.imgs : [];
+  const merged = [...imgsFromArray];
+  if(item?.img) merged.unshift(item.img);
+  return Array.from(new Set(merged.map(v=>String(v||"").trim()).filter(Boolean))).slice(0,MAX_IMAGE_COUNT);
 }
 
 function renderCategoryOptions(selected=""){
@@ -190,7 +216,7 @@ function render(){
   getDB().filter(x=>x.name.toLowerCase().includes(word)).forEach(item=>{
     list.innerHTML+=`
     <div class="card">
-      <img src="${item.img||'https://via.placeholder.com/300x160?text=No+Image'}">
+      <img src="${getItemImages(item)[0]||'https://via.placeholder.com/300x160?text=No+Image'}">
       <div class="card-body">
         <b>${item.name}</b>
         <div class="card-actions">
@@ -203,34 +229,60 @@ function render(){
 }
 
 function handleImgUpload(e){
-  const file=e.target.files[0];
-  if(!file) return;
-  if(!file.type.startsWith("image/")){
+  const files=Array.from(e.target.files||[]);
+  if(!files.length) return;
+  const existing=parseImageList(fimgs.value);
+  const room=Math.max(0,MAX_IMAGE_COUNT-existing.length);
+  if(!room){
     imgStatus.className="status-msg err";
-    imgStatus.innerText="이미지 파일만 업로드할 수 있습니다.";
+    imgStatus.innerText=`이미지는 최대 ${MAX_IMAGE_COUNT}장까지 등록할 수 있습니다.`;
     e.target.value="";
     return;
   }
-  if(file.size>3*1024*1024){
-    imgStatus.className="status-msg err";
-    imgStatus.innerText="이미지는 3MB 이하만 허용됩니다.";
-    return;
+
+  const valid=files.slice(0,room);
+  for(const file of valid){
+    if(!file.type.startsWith("image/")){
+      imgStatus.className="status-msg err";
+      imgStatus.innerText="이미지 파일만 업로드할 수 있습니다.";
+      e.target.value="";
+      return;
+    }
+    if(file.size>3*1024*1024){
+      imgStatus.className="status-msg err";
+      imgStatus.innerText="이미지는 3MB 이하만 허용됩니다.";
+      e.target.value="";
+      return;
+    }
   }
-  const r=new FileReader();
-  r.onload=ev=>{
-    fimg.value=ev.target.result;
+
+  Promise.all(valid.map(file=>new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=ev=>resolve({file,data:ev.target.result});
+    r.readAsDataURL(file);
+  }))).then(results=>{
+    const merged=[...existing,...results.map(x=>x.data)];
+    const normalized=Array.from(new Set(merged)).slice(0,MAX_IMAGE_COUNT);
+    fimgs.value=encodeImageList(normalized);
+    fimg.value=normalized[0]||"";
     imgStatus.className="status-msg ok";
-    imgStatus.innerText=`파일 준비 완료: ${file.name} (${Math.round(file.size/1024)}KB)`;
+    imgStatus.innerText=`이미지 ${results.length}장 추가 완료 (총 ${normalized.length}/${MAX_IMAGE_COUNT}장)`;
     updatePreview();
-  };
-  r.readAsDataURL(file);
+  });
+  e.target.value="";
 }
 function updatePreview(){
-  const hasImg=!!fimg.value;
-  imgPrev.src=fimg.value||"https://via.placeholder.com/400x200?text=No+Image";
-  if(!hasImg){
+  const images=parseImageList(fimgs.value);
+  fimg.value=images[0]||"";
+  imgPrev.src=images[0]||"https://via.placeholder.com/400x200?text=No+Image";
+  imgList.innerHTML=images.map(src=>`<img src="${src}" alt="미리보기">`).join("");
+
+  if(!images.length){
     imgStatus.className="status-msg";
     imgStatus.innerText="이미지를 선택하면 여기에서 미리보기를 확인할 수 있습니다.";
+  }else if(!imgStatus.classList.contains("err")){
+    imgStatus.className="status-msg ok";
+    imgStatus.innerText=`이미지 ${images.length}장 준비 완료`;
   }
 }
 
@@ -252,7 +304,9 @@ function openEdit(item=null){
     renderCategoryOptions(itemCat);
   }
   fcat.value=itemCat||DEFAULT_CATS[0];
-  fimg.value=item?.img||"";
+  const images=getItemImages(item);
+  fimgs.value=encodeImageList(images);
+  fimg.value=images[0]||"";
   fdesc.value=item?.desc||"";
   fad.checked=item?.ad||item?.sponsor||false;
   funtil.value=item?.until||item?.sponsorUntil||"";
@@ -273,7 +327,8 @@ function handleSave(){
     id:fid.value,
     name:fname.value.trim(),
     cat:fcat.value,
-    img:fimg.value.trim(),
+    img:parseImageList(fimgs.value)[0]||"",
+    imgs:parseImageList(fimgs.value),
     desc:fdesc.value.trim(),
     sponsor:fad.checked,
     sponsorUntil:funtil.value,
