@@ -1068,11 +1068,14 @@ function buildList(){
   }
   return list;
 }
-function getFirstImage(p){
-  return getPlaceImages(p)[0] || "";
+function getCardThumbnail(place){
+  const thumbnail = String(place?.thumbnail || "").trim();
+  if(thumbnail) return thumbnail;
+  return getPlaceImages(place)[0] || "";
 }
-function shouldShowPhoto(p){
-  return !!getFirstImage(p);
+function shouldShowPhoto(place){
+  const img = getCardThumbnail(place);
+  return !!img;
 }
 
 function render(){
@@ -1091,7 +1094,7 @@ function render(){
     const svg = cardIllustrationSVG(p);
     const v = views[p.id]||0;
 
-    const img = getFirstImage(p);
+    const img = getCardThumbnail(p);
     const hasPhoto = shouldShowPhoto(p);
 
     /* ✅ 카테고리 카드 / 식당 카드 UI 분리 */
