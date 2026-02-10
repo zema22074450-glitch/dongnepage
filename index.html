@@ -626,7 +626,11 @@ let filter="all", q="";
 let sortMode="new";
 
 /* 실제 식당 목록 */
-let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || [...DEFAULT_PLACES];
+const migratedPlaces = JSON.parse(localStorage.getItem("RESTAURANT_LIST") || "null");
+let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || migratedPlaces || [...DEFAULT_PLACES];
+if(migratedPlaces && !localStorage.getItem("PLACES_DATA")){
+  localStorage.setItem("PLACES_DATA", JSON.stringify(migratedPlaces));
+}
 
 let savedIds = loadSavedIds();
 let views = loadViews();

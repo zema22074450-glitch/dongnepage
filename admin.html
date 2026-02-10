@@ -15,20 +15,40 @@ button:hover{opacity:.85}
 .btn-del{background:#fee2e2;color:var(--danger)}
 .btn-outline{background:transparent;border:1px solid var(--border)}
 
-.admin-bar{position:sticky;top:0;z-index:10;background:#fff;padding:12px 20px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border)}
-.search-box{flex:1;max-width:400px}
+.admin-bar{position:sticky;top:0;z-index:10;background:#fff;padding:12px 20px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.search-box{flex:1;min-width:180px;max-width:400px}
 .search-box input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px}
 
-.grid{padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.grid{padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
 .card{background:#fff;border-radius:16px;border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.05)}
 .card img{width:100%;height:160px;object-fit:cover;background:#f1f5f9}
+.card-body{padding:14px;display:flex;flex-direction:column;gap:8px}
+.card-actions{display:flex;gap:8px}
+.card-actions button{flex:1}
 
 .panel{position:fixed;right:0;top:0;width:100%;max-width:420px;height:100%;background:#fff;z-index:20;padding:24px;overflow:auto;box-shadow:-4px 0 15px rgba(0,0,0,.1)}
 .panel input,.panel select,.panel textarea{margin-bottom:14px;width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px}
-.preview-box{width:100%;height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:10px;object-fit:cover}
+.preview-box{width:100%;height:180px;background:#f1f5f9;border-radius:12px;margin-bottom:10px;object-fit:cover;border:1px solid var(--border)}
+.status-msg{font-size:12px;font-weight:700;color:#475569;margin:-8px 0 12px}
+.status-msg.ok{color:#059669}
+.status-msg.err{color:#dc2626}
 
 #loginBox{max-width:360px;margin:15vh auto;padding:40px;background:#fff;border-radius:20px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.1)}
-.util-btns{padding:0 20px;display:flex;gap:10px;justify-content:flex-end}
+.util-btns{padding:0 20px;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:30}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+@media (max-width: 768px){
+  .admin-bar{padding:12px;gap:8px}
+  .admin-bar b{width:100%}
+  .search-box{order:2;max-width:none;width:100%}
+  .admin-bar button{flex:1}
+  .util-btns{padding:0 12px;justify-content:stretch}
+  .util-btns button{flex:1}
+  .grid{padding:12px;grid-template-columns:1fr;gap:12px}
+  .panel{max-width:none;padding:16px}
+}
 </style>
 </head>
 <body>
@@ -61,13 +81,14 @@ button:hover{opacity:.85}
 
 <div id="editPanel" class="panel hidden">
   <h3 id="panelHeader"></h3>
-  <img id="imgPrev" class="preview-box">
+  <img id="imgPrev" class="preview-box" alt="이미지 미리보기">
+  <div id="imgStatus" class="status-msg">이미지를 선택하면 여기에서 미리보기를 확인할 수 있습니다.</div>
   <input id="fid" readonly>
   <input id="fname" placeholder="가게명 *">
   <select id="fcat"></select>
 
   <input type="file" id="fileInput" accept="image/*" onchange="handleImgUpload(event)">
-  <input id="fimg" placeholder="이미지 URL" oninput="updatePreview()">
+  <input id="fimg" placeholder="이미지 URL 또는 업로드 결과" oninput="updatePreview()">
 
   <textarea id="fdesc" rows="3" placeholder="소개"></textarea>
 
@@ -81,14 +102,22 @@ button:hover{opacity:.85}
   <button class="btn-del" id="delBtn" style="width:100%" onclick="handleDelete()">삭제</button>
 </div>
 
+<div id="toast" class="toast">Saved successfully</div>
+
 <script>
-/* ===== 설정 ===== */
 const ADMIN_ID="admin", ADMIN_PW="1234";
-const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"RESTAURANT_LIST",CAT:"CATEGORY_LIST"};
+const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"PLACES_DATA",CAT:"CATEGORY_LIST"};
 const DEFAULT_CATS=["한식","일식","중식","양식","카페","기타"];
 const LOGIN_LIMIT=1000*60*60*24;
 
-/* ===== 로그인 ===== */
+let toastTimer=null;
+function showToast(msg){
+  toast.innerText=msg;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>toast.classList.remove("show"),1600);
+}
+
 function handleLogin(){
   if(loginId.value===ADMIN_ID&&loginPw.value===ADMIN_PW){
     localStorage.setItem(DB.AUTH,Date.now());init();
@@ -111,10 +140,8 @@ function init(){
 }
 if(localStorage.getItem(DB.AUTH)) init();
 
-/* ===== 데이터 ===== */
 const getDB=()=>JSON.parse(localStorage.getItem(DB.DATA)||"[]");
 
-/* ===== 렌더 ===== */
 function render(){
   const word=(keyword.value||"").toLowerCase();
   list.innerHTML="";
@@ -122,28 +149,49 @@ function render(){
     list.innerHTML+=`
     <div class="card">
       <img src="${item.img||'https://via.placeholder.com/300x160?text=No+Image'}">
-      <div style="padding:14px">
+      <div class="card-body">
         <b>${item.name}</b>
-        <button class="btn-sub" style="width:100%" onclick="openEditById('${item.id}')">수정</button>
+        <div class="card-actions">
+          <button class="btn-sub" onclick="openEditById('${item.id}')">수정</button>
+          <button class="btn-del" onclick="quickDelete('${item.id}')">삭제</button>
+        </div>
       </div>
     </div>`;
   });
 }
 
-/* ===== 이미지 업로드 ===== */
 function handleImgUpload(e){
   const file=e.target.files[0];
   if(!file) return;
-  if(file.size>500*1024) return alert("이미지는 500KB 이하만 허용됩니다.");
+  if(!file.type.startsWith("image/")){
+    imgStatus.className="status-msg err";
+    imgStatus.innerText="이미지 파일만 업로드할 수 있습니다.";
+    e.target.value="";
+    return;
+  }
+  if(file.size>3*1024*1024){
+    imgStatus.className="status-msg err";
+    imgStatus.innerText="이미지는 3MB 이하만 허용됩니다.";
+    return;
+  }
   const r=new FileReader();
-  r.onload=ev=>{fimg.value=ev.target.result;updatePreview();}
+  r.onload=ev=>{
+    fimg.value=ev.target.result;
+    imgStatus.className="status-msg ok";
+    imgStatus.innerText=`파일 준비 완료: ${file.name} (${Math.round(file.size/1024)}KB)`;
+    updatePreview();
+  };
   r.readAsDataURL(file);
 }
 function updatePreview(){
+  const hasImg=!!fimg.value;
   imgPrev.src=fimg.value||"https://via.placeholder.com/400x200?text=No+Image";
+  if(!hasImg){
+    imgStatus.className="status-msg";
+    imgStatus.innerText="이미지를 선택하면 여기에서 미리보기를 확인할 수 있습니다.";
+  }
 }
 
-/* ===== 패널 ===== */
 function openEditById(id){
   openEdit(getDB().find(x=>x.id===id));
 }
@@ -157,30 +205,44 @@ function openEdit(item=null){
   fcat.value=item?.cat||DEFAULT_CATS[0];
   fimg.value=item?.img||"";
   fdesc.value=item?.desc||"";
-  fad.checked=item?.ad||false;
-  funtil.value=item?.until||"";
+  fad.checked=item?.ad||item?.sponsor||false;
+  funtil.value=item?.until||item?.sponsorUntil||"";
   updatePreview();
 }
 function closeAll(){editPanel.classList.add("hidden");fileInput.value="";}
 
-/* ===== 저장 ===== */
 function handleSave(){
   if(!fname.value.trim()) return alert("가게명 필수");
   if(fad.checked&&!funtil.value) return alert("광고 종료일 필수");
   const data=getDB();
-  const item={id:fid.value,name:fname.value.trim(),cat:fcat.value,img:fimg.value.trim(),desc:fdesc.value.trim(),ad:fad.checked,until:funtil.value};
+  const item={
+    id:fid.value,
+    name:fname.value.trim(),
+    cat:fcat.value,
+    img:fimg.value.trim(),
+    desc:fdesc.value.trim(),
+    sponsor:fad.checked,
+    sponsorUntil:funtil.value,
+    ad:fad.checked,
+    until:funtil.value
+  };
   const i=data.findIndex(x=>x.id===item.id);
   i>-1?data[i]=item:data.push(item);
   localStorage.setItem(DB.DATA,JSON.stringify(data));
   closeAll();render();
+  showToast("Saved successfully");
+}
+function quickDelete(id){
+  if(!confirm("삭제할까요?")) return;
+  localStorage.setItem(DB.DATA,JSON.stringify(getDB().filter(x=>x.id!==id)));
+  render();
+  showToast("삭제되었습니다");
 }
 function handleDelete(){
-  if(!confirm("삭제할까요?"))return;
-  localStorage.setItem(DB.DATA,JSON.stringify(getDB().filter(x=>x.id!==fid.value)));
-  closeAll();render();
+  quickDelete(fid.value);
+  closeAll();
 }
 
-/* ===== 백업/복구 ===== */
 function exportData(){
   const blob=new Blob([localStorage.getItem(DB.DATA)||"[]"],{type:"application/json"});
   const a=document.createElement("a");
