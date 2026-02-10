@@ -1071,10 +1071,6 @@ function getCardThumbnail(place){
   if(thumbnail) return thumbnail;
   return getPlaceImages(place)[0] || "";
 }
-function shouldShowPhoto(place){
-  const img = getCardThumbnail(place);
-  return !!img;
-}
 
 function render(){
   grid.innerHTML="";
@@ -1093,14 +1089,14 @@ function render(){
     const v = views[p.id]||0;
 
     const resolvedThumbnail = getCardThumbnail(p);
-    const hasPhoto = shouldShowPhoto(p);
+    const hasPhoto = !!resolvedThumbnail;
 
     /* ✅ 카테고리 카드 / 식당 카드 UI 분리 */
     if(isCategory){
       card.href = buildCategoryUrl(p.catKey);
       card.innerHTML=`
         <div class="thumb">
-          <img src="${hasPhoto ? esc(resolvedThumbnail) : ""}" alt="${esc(p.name)}" style="display:${hasPhoto ? "block" : "none"};" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">
+          ${hasPhoto ? `<img src="${esc(resolvedThumbnail)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
           <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
           <div class="img-overlay"></div>
           <div class="badge">${esc(CategoryStore.displayCategory(p.cat || p.name))}</div>
@@ -1114,7 +1110,7 @@ function render(){
       card.href = buildPlaceUrl(p);
       card.innerHTML=`
         <div class="thumb">
-          <img src="${hasPhoto ? esc(resolvedThumbnail) : ""}" alt="${esc(p.name)}" style="display:${hasPhoto ? "block" : "none"};" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">
+          ${hasPhoto ? `<img src="${esc(resolvedThumbnail)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
           <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
           <div class="img-overlay"></div>
 
