@@ -862,11 +862,6 @@ function buildList(){
   }
   return list;
 }
-function shouldShowPhoto(p){
-  const img = getCardThumbnail(p);
-  return !!img;
-}
-
 function getCardThumbnail(place){
   const thumbnail = String(place?.thumbnail || "").trim();
   if(thumbnail) return thumbnail;
@@ -888,7 +883,7 @@ function render(){
     const v = views[p.id]||0;
 
     const img = getCardThumbnail(p);
-    const hasPhoto = shouldShowPhoto(p);
+    const hasPhoto = !!img;
 
     card.innerHTML=`
       <div class="thumb">
