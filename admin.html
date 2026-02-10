@@ -111,10 +111,11 @@ button:hover{opacity:.85}
 
 <div id="toast" class="toast">Saved successfully</div>
 
+<script src="shared/category-store.js"></script>
 <script>
 const ADMIN_ID="admin", ADMIN_PW="1234";
 const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"PLACES_DATA",CAT:"CATEGORY_LIST"};
-const DEFAULT_CATS=["국밥","일식","중식","고기","카페","술집"];
+const DEFAULT_CATS=CategoryStore.DEFAULT_CATEGORIES;
 const LOGIN_LIMIT=1000*60*60*24;
 
 let toastTimer=null;
@@ -142,21 +143,21 @@ function init(){
   }
   loginBox.classList.add("hidden");
   admin.classList.remove("hidden");
-  if(!localStorage.getItem(DB.CAT)) localStorage.setItem(DB.CAT,JSON.stringify(DEFAULT_CATS));
+  CategoryStore.loadCategories();
   render();
 }
 if(localStorage.getItem(DB.AUTH)) init();
 
 const getDB=()=>JSON.parse(localStorage.getItem(DB.DATA)||"[]");
-const getCategories=()=>JSON.parse(localStorage.getItem(DB.CAT)||"[]");
-const setCategories=(cats)=>localStorage.setItem(DB.CAT,JSON.stringify(cats));
+const getCategories=()=>CategoryStore.loadCategories();
+const setCategories=(cats)=>CategoryStore.saveCategories(cats);
 
 function normalizeCat(value){
   return String(value||"").trim();
 }
 
 function categoryLabel(cat){
-  return cat === "술집" ? "Bar / Pocha (술집)" : cat;
+  return CategoryStore.normalizeCategory(cat);
 }
 
 function renderCategoryOptions(selected=""){
@@ -174,10 +175,11 @@ function addCategory(){
   const cat=normalizeCat(newCat.value);
   if(!cat) return alert("카테고리명을 입력해주세요.");
   const cats=getCategories();
-  if(cats.includes(cat)) return alert("이미 있는 카테고리입니다.");
-  cats.push(cat);
+  const normalized=CategoryStore.normalizeCategory(cat);
+  if(cats.includes(normalized)) return alert("이미 있는 카테고리입니다.");
+  cats.push(normalized);
   setCategories(cats);
-  renderCategoryOptions(cat);
+  renderCategoryOptions(normalized);
   newCat.value="";
   showToast("카테고리가 추가되었습니다");
 }
@@ -242,13 +244,14 @@ function openEdit(item=null){
   panelHeader.innerText=item?"수정":"추가";
   fid.value=item?.id||("R"+Date.now()+Math.floor(Math.random()*1000));
   fname.value=item?.name||"";
-  if(item?.cat && !getCategories().includes(item.cat)){
+  const itemCat=CategoryStore.normalizeCategory(item?.cat);
+  if(itemCat && !getCategories().includes(itemCat)){
     const cats=getCategories();
-    cats.push(item.cat);
+    cats.push(itemCat);
     setCategories(cats);
-    renderCategoryOptions(item.cat);
+    renderCategoryOptions(itemCat);
   }
-  fcat.value=item?.cat||DEFAULT_CATS[0];
+  fcat.value=itemCat||DEFAULT_CATS[0];
   fimg.value=item?.img||"";
   fdesc.value=item?.desc||"";
   fad.checked=item?.ad||item?.sponsor||false;

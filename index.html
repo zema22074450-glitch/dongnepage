@@ -584,6 +584,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 
 <div id="toast" class="toast">저장됨</div>
 
+<script src="shared/category-store.js"></script>
 <script>
 /* 문의 링크 */
 const CONTACT_KAKAO = "https://open.kakao.com/o/gRmo49di";
@@ -593,58 +594,22 @@ const LS_SAVED  = "saved_v2";
 const LS_NICK   = "nick";
 const LS_DARK   = "dark_v1";
 const LS_VIEWS  = "views_v1";
-const LS_CATEGORY = "CATEGORY_LIST";
-const DEFAULT_CATEGORIES = ["국밥","일식","중식","고기","카페","술집"];
+const LS_CATEGORY = CategoryStore.KEY;
 
-function loadCategories(){
-  const raw = localStorage.getItem(LS_CATEGORY);
-  if(!raw){
-    localStorage.setItem(LS_CATEGORY, JSON.stringify(DEFAULT_CATEGORIES));
-    return [...DEFAULT_CATEGORIES];
-  }
-  try{
-    const parsed = JSON.parse(raw);
-    const normalized = Array.isArray(parsed) ? [...new Set(parsed.map(v=>String(v||"").trim()).filter(Boolean))] : [];
-    if(normalized.length){
-      localStorage.setItem(LS_CATEGORY, JSON.stringify(normalized));
-      return normalized;
-    }
-  }catch(e){}
-  localStorage.setItem(LS_CATEGORY, JSON.stringify(DEFAULT_CATEGORIES));
-  return [...DEFAULT_CATEGORIES];
+function buildCategories(){
+  return CategoryStore.loadCategories().map(cat => ({
+    id:`cat-${cat}`,
+    name:cat,
+    cat,
+    catKey:cat,
+    desc:CategoryStore.categoryDescription(cat),
+    img:CategoryStore.categoryImageMap[cat] || "",
+    addr:"",
+    isCategory:true
+  }));
 }
 
-const categoryImageMap = {
-  "국밥":"/images/e7c4388f-4efd-417d-9a75-96d7ff627b86.png",
-  "일식":"/images/dae7e9b3-001d-4cf2-afb0-82189ace540d.png",
-  "중식":"/images/b5e07f79-8873-46a9-8a37-671f7e5c55b9.png",
-  "고기":"/images/022ae54c-e43a-4d5f-979d-bfe29fc5fcd7.png",
-  "카페":"/images/c2853582-352a-4d5a-ad27-1d2ec1474eb1.png",
-  "술집":"/images/0a6acd83-5557-47a8-9ee7-7976ab1a9f37.png"
-};
-
-function categoryDescription(cat){
-  const map = {
-    "국밥":"국밥 맛집 모아보기",
-    "일식":"초밥/회/라멘 모아보기",
-    "중식":"짜장/짬뽕/탕수육 모아보기",
-    "고기":"삼겹/갈비 맛집 모아보기",
-    "카페":"커피/디저트 모아보기",
-    "술집":"Bar / Pocha (술집) 모아보기"
-  };
-  return map[cat] || `${cat} 맛집 모아보기`;
-}
-
-const CATEGORIES = loadCategories().map(cat => ({
-  id:`cat-${cat}`,
-  name:cat,
-  cat,
-  catKey:cat,
-  desc:categoryDescription(cat),
-  img:categoryImageMap[cat] || "",
-  addr:"",
-  isCategory:true
-}));
+let CATEGORIES = buildCategories();
 
 /* ✅ 실제 식당 데이터(여기에 계속 추가하면 됨) */
 const DEFAULT_PLACES = [
@@ -667,6 +632,8 @@ let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || migrat
 if(migratedPlaces && !localStorage.getItem("PLACES_DATA")){
   localStorage.setItem("PLACES_DATA", JSON.stringify(migratedPlaces));
 }
+places = places.map(p=>({ ...p, cat: CategoryStore.normalizeCategory(p.cat) }));
+localStorage.setItem("PLACES_DATA", JSON.stringify(places));
 
 let savedIds = loadSavedIds();
 let views = loadViews();
@@ -687,7 +654,13 @@ function renderPills(){
   const categoryPills = CATEGORIES.map(c=>`<button class="pill" data-filter="${esc(c.catKey)}" type="button">${esc(c.name)}</button>`).join("");
   pillRowEl.innerHTML = `<button class="pill active" data-filter="all" type="button">전체</button>${categoryPills}`;
 }
-renderPills();
+
+function syncCategoriesFromStorage(){
+  CATEGORIES = buildCategories();
+  renderPills();
+}
+
+syncCategoriesFromStorage();
 
 /* 토스트 */
 const toast = document.getElementById("toast");
@@ -1340,6 +1313,14 @@ function rerenderAll(){
 applyRoute();
 renderSaved();
 window.addEventListener("popstate", applyRoute);
+window.addEventListener("storage", (event)=>{
+  if(event.key === LS_CATEGORY){
+    syncCategoriesFromStorage();
+    rerenderAll();
+  }
+});
+
+
 </script>
 
 <noscript>면목동 주민이 직접 추천한 동네 맛집 모음 페이지입니다.</noscript>
