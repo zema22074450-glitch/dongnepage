@@ -543,12 +543,12 @@ const LS_VIEWS  = "views_v1";
 
 /* ✅ 고정 데이터(1단계) */
 const DEFAULT_PLACES = [
-  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", img:"https://source.unsplash.com/1200x900/?gukbap", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", img:"https://source.unsplash.com/1200x900/?sushi", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", img:"https://source.unsplash.com/1200x900/?jjajangmyeon", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", img:"https://source.unsplash.com/1200x900/?samgyeopsal", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", img:"https://source.unsplash.com/1200x900/?coffee%20mug", addr:"", sponsor:false, sponsorUntil:""},
-  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", img:"https://source.unsplash.com/1200x900/?spicy%20stir%20fry", addr:"", sponsor:false, sponsorUntil:""}
+  {id:"d-a", name:"면목동 국밥집", cat:"한식", desc:"날마다 생각나는 국밥", images:["https://source.unsplash.com/1200x900/?gukbap"], addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-b", name:"면목동 일식집", cat:"일식", desc:"신선한 회와 초밥", images:["https://source.unsplash.com/1200x900/?sushi"], addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-c", name:"면목동 중국집", cat:"중식", desc:"고민되는 짜장 짬뽕", images:["https://source.unsplash.com/1200x900/?jjajangmyeon"], addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-d", name:"면목동 고깃집", cat:"고기", desc:"삼겹살 맛집", images:["https://source.unsplash.com/1200x900/?samgyeopsal"], addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-e", name:"면목동 카페", cat:"카페", desc:"커피맛집", images:["https://source.unsplash.com/1200x900/?coffee%20mug"], addr:"", sponsor:false, sponsorUntil:""},
+  {id:"d-f", name:"면목동 포차", cat:"술집", desc:"안주 맛있는 동네 술집", images:["https://source.unsplash.com/1200x900/?spicy%20stir%20fry"], addr:"", sponsor:false, sponsorUntil:""}
 ];
 
 /* 배너(1단계 고정) */
@@ -563,16 +563,17 @@ function unique(list){
 }
 
 function getPlaceImages(place){
-  const fromImgs = Array.isArray(place?.imgs) ? place.imgs : [];
   const fromImages = Array.isArray(place?.images) ? place.images : [];
-  const merged = [...fromImgs, ...fromImages];
-  if(place?.img) merged.push(place.img);
-  return unique(merged.map(v=>String(v||"").trim())).slice(0,4);
+  const normalizedImages = unique(fromImages.map(v=>String(v||"").trim()));
+  if(normalizedImages.length) return normalizedImages.slice(0,4);
+
+  const legacy = [place?.thumbnail, place?.image, place?.img];
+  return unique(legacy.map(v=>String(v||"").trim())).slice(0,4);
 }
 
 places = places.map(place=>{
-  const imgs = getPlaceImages(place);
-  return { ...place, img: imgs[0] || "", imgs };
+  const images = getPlaceImages(place);
+  return { ...place, images };
 });
 
 let savedIds = loadSavedIds();
@@ -863,8 +864,6 @@ function buildList(){
   return list;
 }
 function getCardThumbnail(place){
-  const thumbnail = String(place?.thumbnail || "").trim();
-  if(thumbnail) return thumbnail;
   return getPlaceImages(place)[0] || "";
 }
 
