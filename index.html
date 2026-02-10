@@ -659,7 +659,8 @@ function unique(list){
 
 function getPlaceImages(place){
   const fromArray = Array.isArray(place?.imgs) ? place.imgs : [];
-  const merged = [...fromArray];
+  const fromImagesArray = Array.isArray(place?.images) ? place.images : [];
+  const merged = [...fromArray, ...fromImagesArray];
   if(place?.img) merged.push(place.img);
   return unique(merged.map(v=>String(v||"").trim())).slice(0,4);
 }
