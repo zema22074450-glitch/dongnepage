@@ -863,8 +863,14 @@ function buildList(){
   return list;
 }
 function shouldShowPhoto(p){
-  const img = getPlaceImages(p)[0] || "";
+  const img = getCardThumbnail(p);
   return !!img;
+}
+
+function getCardThumbnail(place){
+  const thumbnail = String(place?.thumbnail || "").trim();
+  if(thumbnail) return thumbnail;
+  return getPlaceImages(place)[0] || "";
 }
 
 function render(){
@@ -881,7 +887,7 @@ function render(){
     const svg = cardIllustrationSVG(p);
     const v = views[p.id]||0;
 
-    const img = getPlaceImages(p)[0] || "";
+    const img = getCardThumbnail(p);
     const hasPhoto = shouldShowPhoto(p);
 
     card.innerHTML=`
