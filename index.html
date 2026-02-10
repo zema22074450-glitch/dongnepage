@@ -147,7 +147,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
 .grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
 .card{border-radius:22px;background:var(--card);border:1px solid var(--border);box-shadow:0 14px 35px rgba(15,23,42,.1);overflow:hidden;cursor:pointer;position:relative;}
 .card-link{display:block;text-decoration:none;color:inherit;}
-.thumb{height:180px;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(15,23,42,.04),rgba(15,23,42,.02));}
+.thumb{position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(15,23,42,.04),rgba(15,23,42,.02));aspect-ratio:4/3;}
 .thumb img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;z-index:1;}
 .thumb .img-overlay{
   position:absolute;inset:0;z-index:2;
@@ -189,6 +189,27 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
   display:none;
 }
 .detail-view.show{display:block;}
+.detail-gallery{
+  margin-top:12px;
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:4px;
+}
+.detail-gallery::-webkit-scrollbar{height:6px;}
+.detail-gallery::-webkit-scrollbar-thumb{background:rgba(100,116,139,.45);border-radius:999px;}
+.detail-slide{
+  flex:0 0 100%;
+  scroll-snap-align:start;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  background:var(--card);
+  aspect-ratio:4/3;
+}
+.detail-slide img{width:100%;height:100%;object-fit:cover;display:block;}
 .detail-meta{font-size:13px;color:var(--muted);font-weight:800;margin-top:6px;}
 .detail-desc{margin-top:8px;font-weight:700;color:var(--text);}
 .detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
@@ -412,7 +433,7 @@ body.dark .banner{background:linear-gradient(90deg, rgba(37,99,235,.20), rgba(34
       <a class="pill" id="backBtn" href="/" style="display:none;">← 카테고리</a>
 
       <div class="search">
-        <input id="searchInput" placeholder="국밥, 초밥, 술집…" />
+        <input id="searchInput" placeholder="국밥, 초밥, 술집·포차…" />
         <a class="search-link" href="https://blog.naver.com/dongnepage" target="_blank" rel="noopener noreferrer">
           동네페이지 블로그 바로가기
         </a>
@@ -632,7 +653,21 @@ let places = JSON.parse(localStorage.getItem("PLACES_DATA") || "null") || migrat
 if(migratedPlaces && !localStorage.getItem("PLACES_DATA")){
   localStorage.setItem("PLACES_DATA", JSON.stringify(migratedPlaces));
 }
-places = places.map(p=>({ ...p, cat: CategoryStore.normalizeCategory(p.cat) }));
+function unique(list){
+  return Array.from(new Set(list.filter(Boolean)));
+}
+
+function getPlaceImages(place){
+  const fromArray = Array.isArray(place?.imgs) ? place.imgs : [];
+  const merged = [...fromArray];
+  if(place?.img) merged.unshift(place.img);
+  return unique(merged.map(v=>String(v||"").trim())).slice(0,4);
+}
+
+places = places.map(p=>{
+  const imgs = getPlaceImages(p);
+  return { ...p, cat: CategoryStore.normalizeCategory(p.cat), img: imgs[0]||"", imgs };
+});
 localStorage.setItem("PLACES_DATA", JSON.stringify(places));
 
 let savedIds = loadSavedIds();
@@ -651,7 +686,7 @@ const sortWrapEl = document.querySelector(".sort");
 
 function renderPills(){
   if(!pillRowEl) return;
-  const categoryPills = CATEGORIES.map(c=>`<button class="pill" data-filter="${esc(c.catKey)}" type="button">${esc(c.name)}</button>`).join("");
+  const categoryPills = CATEGORIES.map(c=>`<button class="pill" data-filter="${esc(c.catKey)}" type="button">${esc(CategoryStore.displayCategory(c.name))}</button>`).join("");
   pillRowEl.innerHTML = `<button class="pill active" data-filter="all" type="button">전체</button>${categoryPills}`;
 }
 
@@ -774,7 +809,7 @@ function applyRoute(){
     viewMode = "list";
     selectedCat = cat;
     filter = cat;
-    pageTitleEl.textContent = cat === "all" ? "전체 맛집" : (cat + " 맛집");
+    pageTitleEl.textContent = cat === "all" ? "전체 맛집" : (CategoryStore.displayCategory(cat) + " 맛집");
     setPillActive(cat);
   }else{
     viewMode = "cats";
@@ -821,7 +856,7 @@ function catIconSVG(cat, stroke){
       <path ${common} d="M8 3c0 2 2 2 2 4M12 3c0 2 2 2 2 4M16 3c0 2 2 2 2 4"/>
     </svg>`;
   }
-  if(c==="술집"){
+  if(c==="술집" || c==="Bar / Pocha (술집)"){
     return `<svg viewBox="0 0 24 24">
       <path ${common} d="M7 3h10l-1 8a4 4 0 0 1-4 3H12a4 4 0 0 1-4-3L7 3z"/>
       <path ${common} d="M9 21h6"/>
@@ -962,14 +997,19 @@ function renderDetail(){
 
   const v = views[place.id] || 0;
   const sponsorText = isSponsorActive(place) ? " · 광고" : "";
-  const meta = `카테고리: <b>${esc(place.cat||"")}</b>${sponsorText} · 조회수(내 기기): <b>${v}</b>`;
+  const meta = `카테고리: <b>${esc(CategoryStore.displayCategory(place.cat||""))}</b>${sponsorText} · 조회수(내 기기): <b>${v}</b>`;
   const desc = place.desc ? ("소개: " + esc(place.desc)) : "소개: (없음)";
   const addr = (place.addr && place.addr.trim()) ? ("주소: " + esc(place.addr)) : "주소: (없음)";
   const mapUrl = buildMapUrl(place);
+  const images = getPlaceImages(place);
+  const galleryHtml = images.length
+    ? `<div class="detail-gallery" aria-label="가게 사진 갤러리">${images.map((src,idx)=>`<div class="detail-slide"><img src="${esc(src)}" alt="${esc(place.name||"가게")} 사진 ${idx+1}"></div>`).join("")}</div>`
+    : "";
 
   detailViewEl.innerHTML = `
     <div class="page-title" style="font-size:20px;-webkit-text-fill-color:unset;background:none;">${esc(place.name || "맛집 상세")}</div>
     <div class="detail-meta">${meta}</div>
+    ${galleryHtml}
     <div class="detail-desc">${desc}</div>
     <div class="detail-meta" style="margin-top:8px;">${addr}</div>
     <div class="detail-actions">
@@ -1016,9 +1056,11 @@ function buildList(){
   }
   return list;
 }
+function getFirstImage(p){
+  return getPlaceImages(p)[0] || "";
+}
 function shouldShowPhoto(p){
-  const img = (p.img||"").trim();
-  return !!img;
+  return !!getFirstImage(p);
 }
 
 function render(){
@@ -1037,7 +1079,7 @@ function render(){
     const svg = cardIllustrationSVG(p);
     const v = views[p.id]||0;
 
-    const img = (p.img||"").trim();
+    const img = getFirstImage(p);
     const hasPhoto = shouldShowPhoto(p);
 
     /* ✅ 카테고리 카드 / 식당 카드 UI 분리 */
@@ -1048,7 +1090,7 @@ function render(){
           ${hasPhoto ? `<img src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'; this.parentElement.querySelector('.thumb-illus').style.display='block';">` : ``}
           <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
           <div class="img-overlay"></div>
-          <div class="badge">${esc(p.cat || p.name)}</div>
+          <div class="badge">${esc(CategoryStore.displayCategory(p.cat || p.name))}</div>
         </div>
         <div class="content">
           <div class="name" style="padding-right:0;">${esc(p.name)}</div>
@@ -1063,7 +1105,7 @@ function render(){
           <div class="thumb-illus" style="${hasPhoto ? "display:none;" : ""}">${svg}</div>
           <div class="img-overlay"></div>
 
-          <div class="badge">${esc(p.cat)}</div>
+          <div class="badge">${esc(CategoryStore.displayCategory(p.cat))}</div>
           ${sponsorActive ? `<div class="badge ad">광고</div>` : ``}
           <button class="heart ${isSaved?"active":""}" title="찜" type="button" aria-label="찜">❤</button>
         </div>
@@ -1118,7 +1160,7 @@ function renderSaved(){
     <a class="saved-item" href="${buildPlaceUrl(p)}" data-id="${p.id}">
       <div class="left">
         <div class="t">${esc(p.name)}</div>
-        <div class="s">${esc(p.cat)} · ${esc(p.desc||"")}</div>
+        <div class="s">${esc(CategoryStore.displayCategory(p.cat))} · ${esc(p.desc||"")}</div>
       </div>
       <div class="right">
         <div class="go">열기</div>
