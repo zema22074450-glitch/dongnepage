@@ -1,11 +1,8 @@
 (function(){
   const KEY = "CATEGORY_LIST";
-  const DEFAULT_CATEGORIES = ["국밥", "일식", "중식", "고기", "카페", "Bar / Pocha (술집)"];
+  const DEFAULT_CATEGORIES = ["국밥", "일식", "중식", "고기", "카페", "술집·포차"];
   const LEGACY_CATEGORY_MAP = {
-    "술집": "Bar / Pocha (술집)",
-    "술집·포차": "Bar / Pocha (술집)"
-  };
-  const CATEGORY_LABEL_MAP = {
+    "술집": "술집·포차",
     "Bar / Pocha (술집)": "술집·포차"
   };
 
@@ -16,7 +13,7 @@
 
   function displayCategory(value){
     const normalized = normalizeCategory(value);
-    return CATEGORY_LABEL_MAP[normalized] || normalized;
+    return normalized;
   }
 
   function normalizeCategoryList(list){
@@ -56,7 +53,7 @@
       "중식": "짜장/짬뽕/탕수육 모아보기",
       "고기": "삼겹/갈비 맛집 모아보기",
       "카페": "커피/디저트 모아보기",
-      "Bar / Pocha (술집)": "술집·포차 모아보기"
+      "술집·포차": "술집·포차 모아보기"
     };
     return map[cat] || `${cat} 맛집 모아보기`;
   }
@@ -67,7 +64,7 @@
     "중식": "/images/b5e07f79-8873-46a9-8a37-671f7e5c55b9.png",
     "고기": "/images/022ae54c-e43a-4d5f-979d-bfe29fc5fcd7.png",
     "카페": "/images/c2853582-352a-4d5a-ad27-1d2ec1474eb1.png",
-    "Bar / Pocha (술집)": "/images/0a6acd83-5557-47a8-9ee7-7976ab1a9f37.png"
+    "술집·포차": "/images/0a6acd83-5557-47a8-9ee7-7976ab1a9f37.png"
   };
 
   window.CategoryStore = {
