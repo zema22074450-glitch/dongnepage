@@ -85,7 +85,14 @@ button:hover{opacity:.85}
   <div id="imgStatus" class="status-msg">이미지를 선택하면 여기에서 미리보기를 확인할 수 있습니다.</div>
   <input id="fid" readonly>
   <input id="fname" placeholder="가게명 *">
-  <select id="fcat"></select>
+  <div style="display:flex;gap:8px;align-items:flex-start">
+    <select id="fcat" style="flex:1;margin-bottom:0"></select>
+    <button class="btn-outline" type="button" onclick="toggleCategoryEditor()">카테고리 추가</button>
+  </div>
+  <div id="catEditor" class="hidden" style="display:flex;gap:8px;margin:10px 0 14px">
+    <input id="newCat" placeholder="새 카테고리명" style="margin:0;flex:1">
+    <button class="btn-main" type="button" onclick="addCategory()">추가</button>
+  </div>
 
   <input type="file" id="fileInput" accept="image/*" onchange="handleImgUpload(event)">
   <input id="fimg" placeholder="이미지 URL 또는 업로드 결과" oninput="updatePreview()">
@@ -107,7 +114,7 @@ button:hover{opacity:.85}
 <script>
 const ADMIN_ID="admin", ADMIN_PW="1234";
 const DB={AUTH:"ADMIN_LOGGED_IN",DATA:"PLACES_DATA",CAT:"CATEGORY_LIST"};
-const DEFAULT_CATS=["한식","일식","중식","양식","카페","기타"];
+const DEFAULT_CATS=["국밥","일식","중식","고기","카페","술집"];
 const LOGIN_LIMIT=1000*60*60*24;
 
 let toastTimer=null;
@@ -141,6 +148,39 @@ function init(){
 if(localStorage.getItem(DB.AUTH)) init();
 
 const getDB=()=>JSON.parse(localStorage.getItem(DB.DATA)||"[]");
+const getCategories=()=>JSON.parse(localStorage.getItem(DB.CAT)||"[]");
+const setCategories=(cats)=>localStorage.setItem(DB.CAT,JSON.stringify(cats));
+
+function normalizeCat(value){
+  return String(value||"").trim();
+}
+
+function categoryLabel(cat){
+  return cat === "술집" ? "Bar / Pocha (술집)" : cat;
+}
+
+function renderCategoryOptions(selected=""){
+  const cats=getCategories();
+  fcat.innerHTML=cats.map(c=>`<option value="${c}">${categoryLabel(c)}</option>`).join("");
+  if(selected&&cats.includes(selected)) fcat.value=selected;
+}
+
+function toggleCategoryEditor(){
+  catEditor.classList.toggle("hidden");
+  if(!catEditor.classList.contains("hidden")) newCat.focus();
+}
+
+function addCategory(){
+  const cat=normalizeCat(newCat.value);
+  if(!cat) return alert("카테고리명을 입력해주세요.");
+  const cats=getCategories();
+  if(cats.includes(cat)) return alert("이미 있는 카테고리입니다.");
+  cats.push(cat);
+  setCategories(cats);
+  renderCategoryOptions(cat);
+  newCat.value="";
+  showToast("카테고리가 추가되었습니다");
+}
 
 function render(){
   const word=(keyword.value||"").toLowerCase();
@@ -196,12 +236,18 @@ function openEditById(id){
   openEdit(getDB().find(x=>x.id===id));
 }
 function openEdit(item=null){
-  fcat.innerHTML=JSON.parse(localStorage.getItem(DB.CAT)).map(c=>`<option>${c}</option>`).join("");
+  renderCategoryOptions(item?.cat||DEFAULT_CATS[0]);
   editPanel.classList.remove("hidden");
   delBtn.classList.toggle("hidden",!item);
   panelHeader.innerText=item?"수정":"추가";
   fid.value=item?.id||("R"+Date.now()+Math.floor(Math.random()*1000));
   fname.value=item?.name||"";
+  if(item?.cat && !getCategories().includes(item.cat)){
+    const cats=getCategories();
+    cats.push(item.cat);
+    setCategories(cats);
+    renderCategoryOptions(item.cat);
+  }
   fcat.value=item?.cat||DEFAULT_CATS[0];
   fimg.value=item?.img||"";
   fdesc.value=item?.desc||"";
@@ -209,7 +255,12 @@ function openEdit(item=null){
   funtil.value=item?.until||item?.sponsorUntil||"";
   updatePreview();
 }
-function closeAll(){editPanel.classList.add("hidden");fileInput.value="";}
+function closeAll(){
+  editPanel.classList.add("hidden");
+  fileInput.value="";
+  catEditor.classList.add("hidden");
+  newCat.value="";
+}
 
 function handleSave(){
   if(!fname.value.trim()) return alert("가게명 필수");
