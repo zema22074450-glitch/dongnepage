@@ -558,6 +558,23 @@ let filter="all", q="";
 let sortMode="new";
 let places = [...DEFAULT_PLACES];
 
+function unique(list){
+  return Array.from(new Set(list.filter(Boolean)));
+}
+
+function getPlaceImages(place){
+  const fromImgs = Array.isArray(place?.imgs) ? place.imgs : [];
+  const fromImages = Array.isArray(place?.images) ? place.images : [];
+  const merged = [...fromImgs, ...fromImages];
+  if(place?.img) merged.push(place.img);
+  return unique(merged.map(v=>String(v||"").trim())).slice(0,4);
+}
+
+places = places.map(place=>{
+  const imgs = getPlaceImages(place);
+  return { ...place, img: imgs[0] || "", imgs };
+});
+
 let savedIds = loadSavedIds();
 let views = loadViews();
 
@@ -846,7 +863,7 @@ function buildList(){
   return list;
 }
 function shouldShowPhoto(p){
-  const img = (p.img||"").trim();
+  const img = getPlaceImages(p)[0] || "";
   return !!img;
 }
 
@@ -864,7 +881,7 @@ function render(){
     const svg = cardIllustrationSVG(p);
     const v = views[p.id]||0;
 
-    const img = (p.img||"").trim();
+    const img = getPlaceImages(p)[0] || "";
     const hasPhoto = shouldShowPhoto(p);
 
     card.innerHTML=`
